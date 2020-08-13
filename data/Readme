@@ -1,0 +1,23 @@
+Here is a description of the vector field files:
+
+  center.vec   - flow is in a circle around a center critical point
+  circles.vec  - 90 rotation of dipole, making two centers
+  const1.vec   - vertical constant field
+  const2.vec   - diagonal constant field
+  const3.vec   - horizontal constant field
+  cylinder.vec - ideal flow around a cylinder
+  dipole.vec   - dipole (two point charges)
+  saddle.vec   - saddle critical point
+  source.vec   - all flow is away from center
+  spiral.vec   - spiral created by turning a source's vectors by 45 degrees
+  vnoise.vec   - vector field noise
+
+Here are some streamline files made from the vector fields above
+and the "stplace" commands that created them:
+
+  dipole_example.st  - from dipole.vec (tufts .04 .1)
+  vnoise_example.st  - from vnoise.vec (opt 0.03)
+
+
+Greg Turk, August 1996
+

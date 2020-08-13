@@ -1,0 +1,422 @@
+                 Streamline Placement Programs
+
+                  Document author: Greg Turk
+
+This document serves both as tutorial and users manual for these four
+programs: mfield, noise, stplace, stdraw.
+
+Files
+-----
+
+There are three kinds of files that are important for creating images
+of vector field using these programs.  They are:
+
+  Vector Fields (extension .vec)
+  Streamlines   (extension .st)
+  Postscript    (extension .ps)
+
+Vector field files contain a regular grid of vectors, stored in binary
+floating-point format with a short ASCII header.  Consult the source code
+file "noise.C" for information about how to create a vector field file.  The
+programs "mfield" and "noise" create vector field files.  The programs
+"stplace" and "stdraw" both use vector field files as input.
+
+Streamline files contain ASCII descriptions of seed points and lengths of
+streamlines.  These files are created by "stplace".  The program "stdraw"
+uses both vector field and streamline files as input in order to draw images
+of streamlines.
+
+The program "stdraw" writes out Postscript descriptions of images.  These
+Postscript files can be viewed using a program such as "ghostview" (public
+domain) or can be sent to a Postscript-savvy printer.
+
+The "mfield" Program
+--------------------
+
+This program creates vector field files (extension .vec).  There are
+eight types of files that it writes:
+
+  1 = circle (default)
+  2 = saddle
+  3 = source
+  4 = sink
+  5 = other saddle
+  6 = electrostatic charges
+  7 = constant vector
+  8 = flow around cylinder
+
+Use the -f <field_type> option to specify which type of vector field you
+wish to write.
+
+The option -s <xsize> <ysize> allows you to choose the size (number of
+grid points) of the vector field.
+
+The vector field can be rotated by specifying -r <angle> (angle given
+in degrees.
+
+Here is an example invocation of "mfield":
+
+  mfield -s 64 32 -f 2 saddle_point.vec
+
+This creates a saddle-point vector field (field type 2) of grid size
+64 by 32 and writes it to the file saddle_point.vec.
+
+The "noise" Program
+-------------------
+
+This is a program that creates vector field noise.  This is done by creating
+a grid of random vectors and then performing a number of smoothing passes
+over the grid.  Each smoothing pass replaces each grid cell with an
+average of the neighboring cell's vectors.
+
+Here is an example of using "noise":
+
+  noise noise1.vec
+
+This creates a 20 by 20 vector field file (the default size) that has been
+smoothed by 40 passes (the default).  Then name of the created file is
+"noise1.vec".
+
+The following command creates a file that has less variation:
+
+  noise -k 200 noise2.vec
+
+The 200 smoothing steps makes the noise2.vec file contain a vector field
+that has a good deal less variation than noise1.vec.  This is due to the
+greater quantity of averaging performed by the smoothing steps.
+
+The "stplace" Program
+---------------------
+
+This program creates a set of streamlines that are placed by image-guided
+optimization.  The output of this program is a streamline file that then
+can be turned into an image by the program "stdraw".
+
+Why are "stplace" and "stdraw" two separate programs?  Keeping the placement
+and drawing functions separate forces us to create a file (the streamline
+file) for a given vector field that contains the complete description of a
+set of streamlines.  It is not at all uncommon to return to the same set of
+streamlines many times to make several different images.  If we do not save
+the streamline file, we cannot use these same streamlines and try out
+different drawing styles for the same streamline positions.  In addition,
+streamline files require much less disk storage than Postscript files that
+contain images of streamlines.
+
+The easiest way to learn to use the "stplace" program is to try a few
+examples.  Go into the "data" directory and invoke "stplace".  (You may
+have to set your Unix path so that it knows were to look for stplace.)
+The program will require you to click twice on your screen to place two
+drawing windows.  By default, these windows are 512 by 512 pixels in size.
+After these windows are mapped onto the screen, the program will give
+this prompt:
+
+  stplace>
+
+Type "vload vnoise".  This should cause the program to read in the vector
+field in the file called "vnoise.vec".  Next, type "hex 12 .1" at the
+prompt.  This will cause the program to create a number of short streamlines
+in a hexagonal grid that has roughly 12 grid points across.  Each of these
+streamlines is length 0.1, which stands for one-tenth of the screen width.
+Most length measures are relative to a screen width of one.
+
+Now type the command "opt .03" at the prompt.  This will cause the program
+to use optimization to place a number of streamlines through the vector
+field.  In one window, you will see the current state of the collection of
+streamlines.  In the second window you will see a graph of "energy" that
+represents the quality of the streamline placement.  This graph should have
+a distinct downward trend as the streamline placement improves.  Place the
+mouse pointer in the window containing the streamlines and click on the left
+mouse button to terminate the optimization.  To write this set of streamlines
+to a file, type "write vnoise_test.st".  The program "stdraw" can be used to
+create high-quality images using this streamline file.
+
+Earlier we used the command "hex 12 .1" to place a number of short
+streamlines on a regular hexagonal grid.  A similar command, "square 12 .1",
+seeds short streamlines on a regular square grid.  Both the hexagonal and
+the square grid placement create streamlines that tend to bunch up and
+overlap in places in the image.  We can create better-placed short
+streamlines by typing "tuft .05 .1" at the prompt.  This command says to
+space the streamlines at a distance of .05 from one another, and to make
+all of the streamlines have .1 as their length.  The "tuft" command,
+like the "opt" command, uses optimization to place the streamlines.  As
+before, the process is terminated when you click the left mouse button
+in the streamline drawing window.
+
+Here is a complete list of commands of "stplace":
+
+  help
+  echo  on/off
+  read  filename
+  vload filename
+  write_streamlines filename
+  draw_streamlines
+  optimize  separation
+  cascade  separation
+  tufts  separation  length
+  taper
+  squares  num_across  length
+  hexagons  num_across  length
+  streamline xorg yorg len1 len2 (taper_tail taper_head)
+  delta_step  value
+  quit
+  exit
+
+The above list is printed by the program if you type "?" or "help".  Any of
+the commands may be abbreviated.  The first command that matches that
+abbreviation in the above list will be used.
+
+Below is a manual of the commands of "stplace".
+
+    help
+
+  Prints out a list of commands.
+
+    echo on/off
+
+  Used to echo to the screen any future text that is read into the
+  command interpreter with the "read" command.
+
+    read  filename
+
+  Read streamlines from the given file.
+
+    vload file.vec
+
+  Load a vector field from a file.
+
+    write_streamlines filename
+
+  Write the current set of streamlines to a file.  The file extension
+  ".st" should be explicitly included in the filename.
+
+    draw_streamlines
+
+  Draw the current set of streamlines in a window.
+
+    optimize  separation
+
+  Uses optimization to create long streamlines for the given vector field.
+  Typical values of separation are from 0.04 (wide separation) down to
+  values such as 0.01 (tightly spaced).  Use the "cascade" command if
+  you wish to use a separation value that is smaller than 0.01.
+
+    cascade  separation
+
+  Uses optimization to create long streamlines for the given vector field.
+  This command differs from the "optimize" command in that it first places
+  widely-spaced streamlines.  With each click of the left mouse, the
+  distance between the streamlines is halved until the final separation
+  distance is reached.
+
+    tufts  separation  length
+
+  Create a set of short streamlines or "tufts".  The tufts will be
+  positioned at the specified separation distance and will have the
+  given length.  Typical values are 0.04 and 0.1 for separation and
+  length, respectively.
+
+    taper
+
+  Use optimization to taper the intensity of the streamlines near their
+  endpoints.  This produces a more even distribution of intensity than
+  if the streamlines were uniform in intensity along their entire length.
+  The optimization is terminated by a click by the left mouse button
+  in the drawing window.
+
+    squares  num_across  length
+
+  Create a number of streamlines that are "seeded" on a square grid.
+  The number of grid points across is given by "num_across", and the
+  streamline lengths are given by "length".
+
+    hexagons  num_across  length
+
+  Create a number of streamlines that are "seeded" on a hexagonal grid.
+  The number of grid points across is given by "num_across", and the
+  streamline lengths are given by "length".
+
+    streamline xorg yorg len1 len2 (taper_tail taper_head)
+    delta_step  value
+
+  Neither of the above commands should be used.  Their purpose is
+  to aid in reading a streamline files using the command interpreter.
+
+    quit
+    exit
+
+  Both of the above commands (as well as control-D) cause the program
+  to terminate.
+
+
+
+The "stdraw" Program
+--------------------
+
+This program is used to create images (on the screen and to a Postscript
+file) of streamlines.
+
+Let us follow through a few examples of using "stdraw".  First, go into
+the "data" directory so that we have some vector fields and streamlines
+to work with.  Next, invoke "stdraw".  You should see a prompt:
+
+  stdraw>
+
+At the prompt, type "vload dipole".  This loads in the dipole vector
+field.  Next, type "read dipole_example.st" at the prompt.  This reads
+in an example collection of streamlines that were made from the dipole
+vector field.  To see these streamlines, type "draw".  If you want to
+save this image to a Postscript file, type "save dipole.ps".
+
+There are several different ways that we can attach arrows to the
+given streamlines.  The "arrow" command is used to specify between these
+types of arrows.  Here is one:
+
+  stdraw> arrows hex
+  stdraw> draw
+
+The above two commands specify that the arrowheads should be placed near
+a hexagonal grid and then "snapped" to the nearest streamline.  Notice that
+many of the arrowheads are placed along the body of the short streamlines
+rather than at the heads.  The "arrows hex" command is usually more
+appropriate for long streamlines.  Next, type:
+
+  stdraw> arrows heads
+  stdraw> draw
+
+The above commands place arrowheads at the head of every streamline.  This
+may cause the image to be too cluttered with arrowheads.  To create a less
+dense collection of arrowheads, type the following:
+
+  stdraw> arrows hexheads
+  stdraw> draw
+
+The above commands cause arrowheads to be placed near the grid of a hexagonal
+grid, similar to the "hex" command.   Rather than the arrowheads being
+snapped to anywhere along the nearest streamline, however, these arrowheads
+jump to the nearest streamline head.  If these arrowheads are still too
+frequent, type "hex_count 3" and then "draw" again.  The "hex_count"
+command says roughly how many hexagonal grid elements across should be
+used for arrowhead placement.
+
+At any time, the command "save <file.ps>" can be used in place of the
+"draw" command and the image will be written to a Postscript file.
+
+Now let us work with some long streamlines.  Exit the program (type "quit"),
+and re-start it.  Type the following commands:
+
+  stdraw> vload vnoise
+  stdraw> read vnoise_example.st
+  stdraw> draw
+
+This should draw a number of long streamlines.  Just as before, we could
+type "arrows hex" and "draw" to place arrows along the body of the
+streamlines.
+
+Long streamlines can also be subdivided into other arrows.  Type the
+command "arrows fancy" and then "draw".  This should create an image
+where many tapered ("fancy") arrows are arranged head-to-tail along the
+streamlines.
+
+Here is a complete list of commands in "stdraw":
+
+  help
+  echo  on/off
+  read  filename
+  vload file.vec
+  draw_picture
+  save_picture file.ps
+  arrows (none | fancy | heads | hex | hexheads)
+  type_arrow (open | filled)
+  size_arrow  length  width
+  hex_count  num_arrows_across
+  fancy_arrow  length (length2) separation
+  width_line  min  max
+  intensity  min  max
+  streamline xorg yorg len1 len2 (taper_tail taper_head)
+  delta_step  value
+  quit
+  exit
+
+The above list is printed by the program if you type "?" or "help".
+As with the "stplace" program, any of the commands may be abbreviated.
+The first command that matches that abbreviation in the above list
+will be used.
+
+Below is a manual of the commands for "stdraw".
+
+    help
+
+  Prints out a list of commands.
+
+    echo on/off
+
+  Used to echo to the screen any future text that is read into the
+  command interpreter with the "read" command.
+
+    read  filename
+
+  Read streamlines from the given file.
+
+    vload file.vec
+
+  Load a vector field from a file.
+
+    draw_picture
+
+  Draw the streamlines in a window on the screen.
+
+    save_picture file.ps
+
+  Save an image of the streamlines in a named Postscript file.
+
+    arrows (none | fancy | heads | hex | hexheads)
+
+  Select what arrowhead type is used when drawing streamlines.  The
+  types are: none, fancy, heads, hex, hexheads.
+
+    type_arrow (open | filled)
+
+  Specify whether the arrowheads should be open (outlined only) or filled
+  with a solid color.
+
+    size_arrow  length  width
+
+  Specify the size of an arrowhead.  Typical values are 0.01 for both the
+  length and width of an arrowhead.
+
+    hex_count  num_arrows_across
+
+  Specify roughly how many hexagonal grid cells across will be used if
+  arrowheads are to be positioned according to a hexagonal pattern.
+
+    fancy_arrow  length separation
+    fancy_arrow  length1 length2 separation
+
+  Specify the length and separation between fancy arrows that are placed
+  head-to-tail along a streamline.  The second form is to specify that the
+  lengths of the arrows should vary according to the magnitude of the vector
+  field.  The range of lengths is a minimum of length1 and a maximum of
+  length2.
+
+    width_line  min  max
+
+  Specify the minimum and maximum width of a streamline.
+
+    intensity  min  max
+
+  Specify the minimum and maximum intensity of a streamline.
+
+    streamline xorg yorg len1 len2 (taper_tail taper_head)
+    delta_step  value
+
+  Neither of the above commands should be used.  Their purpose is
+  to aid in reading a streamline files using the command interpreter.
+
+    quit
+    exit
+
+  Both of the above commands (as well as control-D) cause the program
+  to terminate.
+
+<end of document>
+

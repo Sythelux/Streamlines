@@ -20,5 +20,6 @@ warranty of merchantability or fitness for a particular purpose.
 */
 
 void set_clip_window(float, float, float, float);
+
 int clip_line(float &, float &, float &, float &);
 

@@ -35,11 +35,13 @@ extern char *calloc();
 #define  FALSE 0
 #define  MAX_STRING 1024
 
-typedef char String [MAX_STRING];
+typedef char String[MAX_STRING];
 
-typedef struct afile { FILE *fp;
-                       struct afile *next;
-                     } File, *File_ptr;
+typedef struct afile
+{
+    FILE *fp;
+    struct afile *next;
+} File, *File_ptr;
 
 static File_ptr current_file = NULL;   /* pointer to list of input files */
 
@@ -57,11 +59,15 @@ static int echo_name = 1;  /* flag set if filename printed when read in */
 
 static FILE *audit_file;   /* audit file pointer */
 
-static void open_file (char *);
+static void open_file(char *);
+
 static void close_file();
-static int get_command (char *, char *, char *);
-static void process_command (char *, char *);
-static int match (char *);
+
+static int get_command(char *, char *, char *);
+
+static void process_command(char *, char *);
+
+static int match(char *);
 
 
 /******************************************************************************
@@ -85,11 +91,11 @@ Exit:
   name - possibly modified file name
 ******************************************************************************/
 
-void add_extension (char *name, char *extension)
+void add_extension(char *name, char *extension)
 {
   char *pos;
 
-  for (pos = name; *pos != '.' && *pos != '\0'; pos++) ;
+  for (pos = name; *pos != '.' && *pos != '\0'; pos++);
 
   if (*pos != '.') {
     *pos++ = '.';
@@ -110,12 +116,12 @@ Exit:
   name - file name from the input line
 ******************************************************************************/
 
-void get_file_name (char *name, char *extension)
+void get_file_name(char *name, char *extension)
 {
-  get_parameter (name);
-  add_extension (name, extension);
+  get_parameter(name);
+  add_extension(name, extension);
   if (echo_name)
-    printf ("File name : %s.\n", name);
+    printf("File name : %s.\n", name);
 }
 
 
@@ -124,12 +130,12 @@ Get a file name from the current parameter and have commands read from the
 file.
 ******************************************************************************/
 
-void open_cli_file (char *extension)
+void open_cli_file(char *extension)
 {
   String filename;
 
-  get_file_name (filename, extension);
-  open_file (filename);
+  get_file_name(filename, extension);
+  open_file(filename);
 }
 
 
@@ -140,17 +146,17 @@ Entry:
   name - name of file to open
 ******************************************************************************/
 
-static void open_file (char *name)
+static void open_file(char *name)
 {
   File_ptr new_file;
   FILE *fp;
 
-  fp = fopen (name, "r");
+  fp = fopen(name, "r");
 
   if (fp == NULL)
-    printf ("File %s could not be opened.\n", name);
+    printf("File %s could not be opened.\n", name);
   else {
-    new_file = (File_ptr) calloc (1, sizeof (File));
+    new_file = (File_ptr) calloc(1, sizeof(File));
     new_file->next = current_file;
     new_file->fp = fp;
     current_file = new_file;
@@ -164,7 +170,7 @@ Close the current CLI input file.
 
 static void close_file()
 {
-  fclose (current_file->fp);
+  fclose(current_file->fp);
   current_file = current_file->next;
 }
 
@@ -181,7 +187,7 @@ Exit:
   returns 1 if a command line was read, a 0 if there were no lines to read
 ******************************************************************************/
 
-static int get_command (char *line, char *prompt, char *extension)
+static int get_command(char *line, char *prompt, char *extension)
 {
   char *pos;
   char *c_status;
@@ -189,7 +195,7 @@ static int get_command (char *line, char *prompt, char *extension)
 
   if (file_is_open()) {
 
-    c_status = fgets (line, MAX_STRING, current_file->fp);
+    c_status = fgets(line, MAX_STRING, current_file->fp);
     if (c_status == NULL)
       status = NULL;
     else
@@ -205,15 +211,13 @@ static int get_command (char *line, char *prompt, char *extension)
 
     if (status == NULL) {
       close_file();
-      status = get_command (line, prompt, extension);
-    }
-    else if (echo_on)
-      printf ("%s>%s%s\n", prompt, extension, line);
-  }
-  else {
-    printf ("%s%s", prompt, extension);
+      status = get_command(line, prompt, extension);
+    } else if (echo_on)
+      printf("%s>%s%s\n", prompt, extension, line);
+  } else {
+    printf("%s%s", prompt, extension);
 
-    c_status = fgets (line, MAX_STRING, stdin);
+    c_status = fgets(line, MAX_STRING, stdin);
     if (c_status == NULL)
       status = NULL;
     else
@@ -226,7 +230,7 @@ static int get_command (char *line, char *prompt, char *extension)
   /* write command line to audit file if auditing */
 
   if (audit_on && status)
-    fprintf (audit_file, "%s\n", line);
+    fprintf(audit_file, "%s\n", line);
 
   return (status);
 }
@@ -244,7 +248,7 @@ Exit:
   line - the processed line
 ******************************************************************************/
 
-static void process_command (char *line, char *prompt)
+static void process_command(char *line, char *prompt)
 {
   char *pos;            /* position in line */
   char *pos_extra;      /* position in extra line */
@@ -258,12 +262,12 @@ static void process_command (char *line, char *prompt)
 
   /* look for continuation symbol */
 
-  for (pos = line; *pos != '\0' && *pos != '&'; pos++) ;
+  for (pos = line; *pos != '\0' && *pos != '&'; pos++);
 
   /* get an extra line if neccessary */
 
-  if (*pos == '&' && get_command (extra, prompt, "--")) {
-    process_command (extra, prompt);
+  if (*pos == '&' && get_command(extra, prompt, "--")) {
+    process_command(extra, prompt);
     *pos++ = ' ';
     for (pos_extra = extra; *pos_extra != '\0'; pos++, pos_extra++)
       *pos = *pos_extra;
@@ -290,27 +294,27 @@ Entry:
   prompt - prompt for printing if input is from keyboard
 ******************************************************************************/
 
-void read_command (char *prompt)
+void read_command(char *prompt)
 {
   int got_one;
 
-  got_one = get_command (input_line, prompt, "> ");
+  got_one = get_command(input_line, prompt, "> ");
 
-  if (! got_one)
+  if (!got_one)
     return;
 
-  process_command (input_line, prompt);
+  process_command(input_line, prompt);
 
   line_ptr = input_line;
-  get_parameter (the_command);
+  get_parameter(the_command);
 
   /* set various flags */
 
-  input_done = input_done || match ("exit") || match (".");
-  help_on = match ("help") || match ("?") || match ("/");
-  comment_on = (input_line [0] == ' ')
-            || (input_line [0] == '\0')
-            || (input_line [0] == '!');
+  input_done = input_done || match("exit") || match(".");
+  help_on = match("help") || match("?") || match("/");
+  comment_on = (input_line[0] == ' ')
+               || (input_line[0] == '\0')
+               || (input_line[0] == '!');
 }
 
 
@@ -324,7 +328,7 @@ Exit:
   returns 1 if word matches, 0 otherwise
 ******************************************************************************/
 
-static int match (char *word)
+static int match(char *word)
 {
   char *save_word;    /* save the word */
   char *pos;          /* position in first parameter of current command */
@@ -340,10 +344,9 @@ static int match (char *word)
   }
 
   if (*pos == '\0' && pos != the_command) {
-    strcpy (last_match, save_word);
+    strcpy(last_match, save_word);
     return (1);
-  }
-  else
+  } else
     return (0);
 }
 
@@ -368,7 +371,7 @@ Exit:
   returns 1 if word matches, 0 otherwise
 ******************************************************************************/
 
-int cli_command (char *word)
+int cli_command(char *word)
 {
   /* if there is no input to match or we are in comment mode, return */
 
@@ -378,13 +381,13 @@ int cli_command (char *word)
   /* if we are in help mode, print the command word and leave */
 
   if (help_on) {
-    printf ("%s\n", word);
+    printf("%s\n", word);
     return (0);
   }
 
   /* see if the command word matches the first word of the command line */
 
-  return (match (word));
+  return (match(word));
 }
 
 
@@ -396,7 +399,7 @@ Exit:
   returns 1 if there was a parameter to return, 0 otherwise
 ******************************************************************************/
 
-int get_parameter (char *param)
+int get_parameter(char *param)
 {
   int count;
 
@@ -409,7 +412,7 @@ int get_parameter (char *param)
 
   count = 0;
 
-  while (*line_ptr != ' ' && *line_ptr != '\0') {
+  while (*line_ptr != ' ' && *line_ptr != '\0' && *line_ptr != '\n') {
     *param++ = *line_ptr++;
     count++;
   }
@@ -428,7 +431,7 @@ Exit:
   returns 1 if there was anything to return, 0 otherwise
 ******************************************************************************/
 
-int get_string (char *string)
+int get_string(char *string)
 {
   int count;
 
@@ -463,12 +466,12 @@ Exit:
 
 int get_boolean()
 {
-  char s [80];
+  char s[80];
   char *pos;
 
   /* return FALSE if there is no parameter */
 
-  if (! get_parameter (s))
+  if (!get_parameter(s))
     return (FALSE);
 
   /* convert string to lower case */
@@ -478,13 +481,13 @@ int get_boolean()
 
   /* now see what it matches */
 
-  if (! strcmp (s, "0"))
+  if (!strcmp(s, "0"))
     return (FALSE);
-  else if (! strcmp (s, "off"))
+  else if (!strcmp(s, "off"))
     return (FALSE);
-  else if (! strcmp (s, "false"))
+  else if (!strcmp(s, "false"))
     return (FALSE);
-  else if (! strcmp (s, "no"))
+  else if (!strcmp(s, "no"))
     return (FALSE);
   else
     return (TRUE);
@@ -499,16 +502,16 @@ Exit:
   returns 1 if there was a parameter to convert to integer, 0 otherwise
 ******************************************************************************/
 
-int get_integer (int *n)
+int get_integer(int *n)
 {
   String s;
   int got_one;     /* did we get a parameter? */
 
-  got_one = get_parameter (s);
+  got_one = get_parameter(s);
 
   *n = 0;
   if (got_one)
-    sscanf (s, "%d", n);
+    sscanf(s, "%d", n);
 
   return (got_one);
 }
@@ -522,16 +525,16 @@ Exit:
   returns 1 if there was a parameter to convert to float, 0 otherwise
 ******************************************************************************/
 
-int get_real (float *r)
+int get_real(float *r)
 {
   String s;
   int got_one;     /* did we get a parameter? */
 
-  got_one = get_parameter (s);
+  got_one = get_parameter(s);
 
   *r = 0.0;
   if (got_one)
-    sscanf (s, "%f", r);
+    sscanf(s, "%f", r);
 
   return (got_one);
 }
@@ -545,16 +548,16 @@ Exit:
   returns 1 if there was a parameter to convert to double, 0 otherwise
 ******************************************************************************/
 
-int get_double (double *r)
+int get_double(double *r)
 {
   String s;
   int got_one;     /* did we get a parameter? */
 
-  got_one = get_parameter (s);
+  got_one = get_parameter(s);
 
   *r = 0.0;
   if (got_one)
-    sscanf (s, "%lf", r);
+    sscanf(s, "%lf", r);
 
   return (got_one);
 }
@@ -567,10 +570,10 @@ Entry:
   message - error message to print
 ******************************************************************************/
 
-void none_of_the_above (char *message)
+void none_of_the_above(char *message)
 {
-  if ((! input_done) && (! help_on) && (! comment_on))
-    printf ("%s\n", message);
+  if ((!input_done) && (!help_on) && (!comment_on))
+    printf("%s\n", message);
 }
 
 
@@ -584,12 +587,12 @@ Exit:
   returns 1 if there are no more commands, 0 otherwise
 ******************************************************************************/
 
-int no_more_commands (char *message)
+int no_more_commands(char *message)
 {
   int result;
 
   if (input_done)
-    printf ("%s\n", message);
+    printf("%s\n", message);
 
   result = input_done;
   input_done = 0;        /* reset flag in case we are exiting a submenu */
@@ -602,22 +605,21 @@ Open an audit file.  While file is open, all user commands will be written to
 this file.
 ******************************************************************************/
 
-void begin_audit (char *filename)
+void begin_audit(char *filename)
 {
   /* exit if audit file already open */
 
   if (audit_on) {
-    printf ("Audit file already open.\n");
+    printf("Audit file already open.\n");
     return;
   }
 
-  audit_file = fopen (filename, "w");
+  audit_file = fopen(filename, "w");
 
   if (audit_file == NULL) {
-    printf ("Error opening audit file.\n");
+    printf("Error opening audit file.\n");
     audit_on = FALSE;
-  }
-  else
+  } else
     audit_on = TRUE;
 }
 
@@ -629,7 +631,7 @@ Close the audit file.
 void end_audit()
 {
   if (audit_on)
-    fclose (audit_file);
+    fclose(audit_file);
 
   audit_on = FALSE;
 }
@@ -642,7 +644,7 @@ Entry:
   flag - whether to echo file (0 = don't echo, 1 = do echo)  
 ******************************************************************************/
 
-void set_echo_filename (int flag)
+void set_echo_filename(int flag)
 {
   echo_name = flag;
 }

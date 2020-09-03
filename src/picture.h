@@ -26,19 +26,28 @@ warranty of merchantability or fitness for a particular purpose.
 #define  PICT_WINDOW_TYPE      1
 #define  PICT_POSTSCRIPT_TYPE  2
 
-class Picture {
-  int type;       /* window or postscript file? */
-  int portrait;   /* portrait or landscape, if Postscript */
-  Window2d *win;  /* window to draw to */
+class Picture
+{
+    int type;       /* window or postscript file? */
+    int portrait;   /* portrait or landscape, if Postscript */
+    Window2d *win;  /* window to draw to */
 public:
-  Picture(Window2d*);
-  Picture(float,float,int,char*);
-  ~Picture() {}
-  void polygon_start();
-  void polygon_vertex(float,float);
-  void polygon_fill();
-  void thick_line(float,float,float,float,float);
-  void set_intensity(float);
+    Picture(Window2d *);
+
+    Picture(float, float, int, char *);
+
+    ~Picture()
+    {}
+
+    void polygon_start();
+
+    void polygon_vertex(float, float);
+
+    void polygon_fill();
+
+    void thick_line(float, float, float, float, float);
+
+    void set_intensity(float);
 };
 
 #endif /* _PICTURE_CLASS_ */

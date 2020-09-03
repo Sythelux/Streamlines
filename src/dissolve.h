@@ -20,22 +20,27 @@ warranty of merchantability or fitness for a particular purpose.
 #define _DISSOLVE_CLASS_
 
 
-class Dissolve {
-  int width,height;
-  int seq;
-  int regwidth;
-  int mask;
-  int initial_value;
-public: 
-  Dissolve(int w, int h);
-  int next_value();
-  void set_initial_value(int val) {
-    if (val != 0)
-      initial_value = val;
-    else
-      initial_value = 1;
-  }
-  void new_position(int &, int &);
+class Dissolve
+{
+    int width, height;
+    int seq;
+    int regwidth;
+    int mask;
+    int initial_value;
+public:
+    Dissolve(int w, int h);
+
+    int next_value();
+
+    void set_initial_value(int val)
+    {
+      if (val != 0)
+        initial_value = val;
+      else
+        initial_value = 1;
+    }
+
+    void new_position(int &, int &);
 };
 
 #endif /* _DISSOLVE_CLASS_ */

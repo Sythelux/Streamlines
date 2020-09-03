@@ -39,13 +39,16 @@ int Rank = 2;
 
 static char *myname;
 
-class Vec {
+class Vec
+{
 public:
-  float x,y;
-  Vec(float xx, float yy) {
-    x = xx;
-    y = yy;
-  }
+    float x, y;
+
+    Vec(float xx, float yy)
+    {
+      x = xx;
+      y = yy;
+    }
 };
 
 Vec ***grid;
@@ -56,29 +59,29 @@ Vec ***new_grid;
 Main routine.
 ******************************************************************************/
 
-void main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
-  register int   i, j;
-  char          *file;
-  float         *VectorField;
-  int            fd, cc;
-  char           str[80];
+  register int i, j;
+  char *file;
+  float *VectorField;
+  int fd, cc;
+  char str[80];
   char *s;
   int lic_style = 0;    /* write out LIC file type? */
-  float fx,fy;
+  float fx, fy;
   int normalize = 1;
   int smoothing_steps = 40;
 
   myname = argv[0];
 
-  while(--argc > 0 && (*++argv)[0]=='-') {
-    for(s = argv[0]+1; *s; s++)
-      switch(*s) {
-	case 's':
-	  xsize = atoi (*++argv);
-	  ysize = atoi (*++argv);
-	  argc -= 2;
-	  break;
+  while (--argc > 0 && (*++argv)[0] == '-') {
+    for (s = argv[0] + 1; *s; s++)
+      switch (*s) {
+        case 's':
+          xsize = atoi(*++argv);
+          ysize = atoi(*++argv);
+          argc -= 2;
+          break;
         case 'l':
           lic_style = 1;
           break;
@@ -86,13 +89,13 @@ void main(int argc, char *argv[])
           normalize = 1 - normalize;
           break;
         case 'k':
-          smoothing_steps = atoi (*++argv);
+          smoothing_steps = atoi(*++argv);
           argc -= 1;
           break;
-	default:
+        default:
           usage();
-          exit (-1);
-	  break;
+          exit(-1);
+          break;
       }
   }
 
@@ -102,10 +105,10 @@ void main(int argc, char *argv[])
     file = *argv;
   else {
     usage();
-    exit (-1);
+    exit(-1);
   }
 
-  VectorField = (float *)malloc(sizeof(float)*ysize*xsize*2);
+  VectorField = (float *) malloc(sizeof(float) * ysize * xsize * 2);
   if (VectorField == NULL) {
     fprintf(stderr, "%s: insufficient memory for creating the field\n", myname);
     exit(-1);
@@ -129,15 +132,14 @@ void main(int argc, char *argv[])
       float y = 2 * (drand48() - 0.5);
 
       if (normalize) {
-        float len = sqrt (x*x + y*y);
+        float len = sqrt(x * x + y * y);
         grid[j][i] = new Vec(x / len, y / len);
-      }
-      else
-        grid[j][i] = new Vec(x,y);
+      } else
+        grid[j][i] = new Vec(x, y);
 
       new_grid[j][i] = new Vec(0.0, 0.0);
     }
-  
+
   /* smooth the random vectors */
 
   for (int num = 0; num < smoothing_steps; num++) {
@@ -163,11 +165,11 @@ void main(int argc, char *argv[])
     if (normalize)
       for (j = 0; j < ysize; j++)
         for (i = 0; i < xsize; i++) {
-            float x = grid[j][i]->x;
-            float y = grid[j][i]->y;
-            float len = sqrt (x*x + y*y);
-            grid[j][i] = new Vec(x / len, y / len);
-          }
+          float x = grid[j][i]->x;
+          float y = grid[j][i]->y;
+          float len = sqrt(x * x + y * y);
+          grid[j][i] = new Vec(x / len, y / len);
+        }
 
   }
 
@@ -181,33 +183,32 @@ void main(int argc, char *argv[])
 
       /* save vector value */
       if (lic_style) {
-        VectorField[2*((ysize - j - 1)*xsize + i) + 0] = fx;
-        VectorField[2*((ysize - j - 1)*xsize + i) + 1] = fy;
+        VectorField[2 * ((ysize - j - 1) * xsize + i) + 0] = fx;
+        VectorField[2 * ((ysize - j - 1) * xsize + i) + 1] = fy;
+      } else {
+        VectorField[2 * (j * xsize + i) + 0] = fx;
+        VectorField[2 * (j * xsize + i) + 1] = fy;
       }
-      else {
-        VectorField[2*(j*xsize + i) + 0] = fx;
-        VectorField[2*(j*xsize + i) + 1] = fy;
-      }
-   }
+    }
   }
 
-  fd = open(file, O_CREAT|O_TRUNC|O_WRONLY, 0666);
+  fd = open(file, O_CREAT | O_TRUNC | O_WRONLY, 0666);
   if (fd < 0) {
     fprintf(stderr, "%s: unable to open %s: %s\n", myname, file,
             strerror(errno));
     exit(-1);
   }
 
-  sprintf (str, "VF\n%d %d %d\n%d\n", xsize, ysize, zsize, Rank);
+  sprintf(str, "VF\n%d %d %d\n%d\n", xsize, ysize, zsize, Rank);
   cc = write(fd, str, strlen(str));
   if (cc == -1) {
-    fprintf (stderr, "Can't write to file.\n");
-    exit (-1);
+    fprintf(stderr, "Can't write to file.\n");
+    exit(-1);
   }
 
-  cc = write(fd, VectorField, 2*sizeof(float)*xsize*ysize);
+  cc = write(fd, VectorField, 2 * sizeof(float) * xsize * ysize);
 
-  if (cc != 2*sizeof(float)*xsize*ysize) {
+  if (cc != 2 * sizeof(float) * xsize * ysize) {
     fprintf(stderr, "%s: write returned short: %s\n", myname,
             strerror(errno));
     close(fd);
@@ -224,8 +225,8 @@ Print out usage information.
 
 void usage()
 {
-  fprintf (stderr, "%s: { options } output_file\n", myname);
-  fprintf (stderr, "        -s xsize ysize (default 20 by 20)\n");
-  fprintf (stderr, "        -k smoothing_steps (default 40)\n");
+  fprintf(stderr, "%s: { options } output_file\n", myname);
+  fprintf(stderr, "        -s xsize ysize (default 20 by 20)\n");
+  fprintf(stderr, "        -k smoothing_steps (default 40)\n");
 }
 

@@ -33,13 +33,13 @@ warranty of merchantability or fitness for a particular purpose.
 extern VectorField *vf;
 
 static FloatImage *separation = NULL;    /* separation between lines */
-static float sep_min,sep_max;            /* min and max separation */
+static float sep_min, sep_max;            /* min and max separation */
 static float blur_min;                   /* minimum blur radius */
 static float separation_to_blur;         /* conversion factor */
 static float delta_move;                 /* moving streamline */
 static float delta_length;               /* lengthen/shorten streamline */
 static float join_factor;                /* max. distance to join lines */
-  
+
 static float birth_length;               /* birth length of streamline */
 static int vary_birth_length;            /* whether birth length varies */
 
@@ -60,9 +60,9 @@ Initialize various visualization parameters.
 
 void vis_initialize()
 {
-  separation = new FloatImage (4, 40);
-  separation->setimage (0.04);
-  separation->get_extrema (sep_min, sep_max);
+  separation = new FloatImage(4, 40);
+  separation->setimage(0.04);
+  separation->get_extrema(sep_min, sep_max);
 
   separation_to_blur = 6.0 / 5.0;
   blur_min = 2.0;
@@ -108,7 +108,7 @@ Set the separation distance between streamlines to a constant.
 void vis_set_separation(float s)
 {
   separation->setimage(s);
-  separation->get_extrema (sep_min, sep_max);
+  separation->get_extrema(sep_min, sep_max);
 }
 
 
@@ -120,7 +120,7 @@ an image.
 void vis_set_variable_separation(FloatImage *img)
 {
   separation = img->copy();
-  separation->get_extrema (sep_min, sep_max);
+  separation->get_extrema(sep_min, sep_max);
 }
 
 
@@ -131,7 +131,7 @@ in the image.
 
 float vis_get_separation(float x, float y)
 {
-  float sep = separation->get_value(x,y);
+  float sep = separation->get_value(x, y);
   return (sep);
 }
 
@@ -163,7 +163,7 @@ Return the correct blur radius at a particular place in the lowpass image.
 
 float vis_get_blur_radius(float x, float y)
 {
-  float sep = separation->get_value(x,y);
+  float sep = separation->get_value(x, y);
   return (blur_min * sep / sep_min);
 }
 
@@ -186,10 +186,9 @@ in the lowpass image.
 float vis_get_birth_length(float x, float y)
 {
   if (vary_birth_length) {
-    float sep = separation->get_value(x,y);
+    float sep = separation->get_value(x, y);
     return (birth_length * sep / sep_min);
-  }
-  else
+  } else
     return (birth_length);
 }
 
@@ -220,7 +219,7 @@ Get the scaling factor for how far to move a streamline.
 
 float vis_get_delta_move(float x, float y)
 {
-  float sep = separation->get_value(x,y);
+  float sep = separation->get_value(x, y);
   return (delta_move * sep);
 }
 
@@ -241,7 +240,7 @@ Get the scaling factor for how much to lengthen or shorten a streamline.
 
 float vis_get_delta_length(float x, float y)
 {
-  float sep = separation->get_value(x,y);
+  float sep = separation->get_value(x, y);
   return (delta_length * sep);
 }
 
@@ -262,7 +261,7 @@ Return the distance over which two lines may be joined.
 
 float vis_get_join_distance(float x, float y)
 {
-  float sep = separation->get_value(x,y);
+  float sep = separation->get_value(x, y);
   return (sep * join_factor * separation_to_blur);
 }
 
@@ -301,9 +300,9 @@ void vis_set_intensity(FloatImage *img, float min, float max)
 {
   if (intensity)
     delete intensity;
-  
+
   intensity = img->copy();
-  intensity->remap (min, max);
+  intensity->remap(min, max);
 }
 
 
@@ -314,7 +313,7 @@ Given a position, return the drawing intensity.
 float vis_get_intensity(float x, float y)
 {
   if (intensity)
-    return (intensity->get_value(x,y));
+    return (intensity->get_value(x, y));
   else
     return (draw_intensity);
 }
@@ -356,9 +355,9 @@ void vis_set_draw_width(FloatImage *img, float min, float max)
 {
   if (dwidth)
     delete dwidth;
-  
+
   dwidth = img->copy();
-  dwidth->remap (min, max);
+  dwidth->remap(min, max);
 }
 
 
@@ -369,7 +368,7 @@ Given a position, return the drawing width.
 float vis_get_draw_width(float x, float y)
 {
   if (dwidth)
-    return (dwidth->get_value(x,y));
+    return (dwidth->get_value(x, y));
   else
     return (draw_width);
 }
@@ -412,9 +411,9 @@ void vis_set_arrow_length(FloatImage *img, float min, float max)
 {
   if (arrow_len_img)
     delete arrow_len_img;
-  
+
   arrow_len_img = img->copy();
-  arrow_len_img->remap (min, max);
+  arrow_len_img->remap(min, max);
   max_arrow_len = max;
 }
 
@@ -426,7 +425,7 @@ Given a position, return the arrow length.
 float vis_get_arrow_length(float x, float y)
 {
   if (arrow_len_img)
-    return (arrow_len_img->get_value(x,y));
+    return (arrow_len_img->get_value(x, y));
   else
     return (arrow_len);
 }

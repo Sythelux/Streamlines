@@ -113,7 +113,7 @@ Exit:
   returns new bundle of streamlines
 ******************************************************************************/
 
-Bundle* RepelTable::repel(Bundle *bundle, float delta, float rmove)
+Bundle *RepelTable::repel(Bundle *bundle, float delta, float rmove)
 {
   for (int i = 0; i < x_wrap; i++)
     for (int j = 0; j < y_wrap; j++)
@@ -130,7 +130,7 @@ Bundle* RepelTable::repel(Bundle *bundle, float delta, float rmove)
     /* place all streamline's points in the table */
     for (int j = 0; j < st->samples; j++) {
       SamplePoint *sample = &st->pts[j];
-      CellEntry *cell = new CellEntry (sample);
+      CellEntry *cell = new CellEntry(sample);
       int a = (int) (x_scale * sample->x);
       int b = (int) (y_scale * sample->y);
       if (a < 0 || a >= x_wrap || b < 0 || b >= y_wrap)
@@ -169,13 +169,13 @@ Bundle* RepelTable::repel(Bundle *bundle, float delta, float rmove)
 
       for (int a = amin; a <= amax; a++)
         for (int b = bmin; b <= bmax; b++)
-          for (cell=cells[a%x_wrap][b%y_wrap]; cell != NULL; cell=cell->next) {
+          for (cell = cells[a % x_wrap][b % y_wrap]; cell != NULL; cell = cell->next) {
             s = cell->sample;
             if (s->st == st)
               continue;
             float dx = x - s->x;
             float dy = y - s->y;
-            float dist = dx*dx + dy*dy;
+            float dist = dx * dx + dy * dy;
             if (dist > dist_max)
               continue;
             dist = sqrt(dist);
@@ -191,8 +191,8 @@ Bundle* RepelTable::repel(Bundle *bundle, float delta, float rmove)
 
   for (int i = 0; i < bundle->num_lines; i++) {
     Streamline *st = bundle->get_line(i);
-    float x,y;
-    st->get_origin(x,y);
+    float x, y;
+    st->get_origin(x, y);
     float len = st->get_length();
 
     /* change position based on repulsion */
@@ -205,8 +205,8 @@ Bundle* RepelTable::repel(Bundle *bundle, float delta, float rmove)
     if (y < 0) y = 0;
     if (y > vf->getaspect()) y = vf->getaspect();
 
-    Streamline *new_st = new Streamline (vf, x, y, len, delta);
-    new_bundle->add_line (new_st);
+    Streamline *new_st = new Streamline(vf, x, y, len, delta);
+    new_bundle->add_line(new_st);
   }
 
 
@@ -243,7 +243,7 @@ Entry:
 
 void RepelTable::add_endpoints(Streamline *st, int head, int tail)
 {
-  int a,b;
+  int a, b;
   SamplePoint *sample;
   CellEntry *cell;
 
@@ -252,7 +252,7 @@ void RepelTable::add_endpoints(Streamline *st, int head, int tail)
   if (tail) {
 
     sample = &st->pts[0];
-    cell = new CellEntry (sample);
+    cell = new CellEntry(sample);
 
     a = (int) (x_scale * sample->x);
     b = (int) (y_scale * sample->y);
@@ -269,8 +269,8 @@ void RepelTable::add_endpoints(Streamline *st, int head, int tail)
 
   if (head) {
 
-    sample = &st->pts[st->samples-1];
-    cell = new CellEntry (sample);
+    sample = &st->pts[st->samples - 1];
+    cell = new CellEntry(sample);
 
     a = (int) (x_scale * sample->x);
     b = (int) (y_scale * sample->y);
@@ -299,7 +299,7 @@ void RepelTable::add_all_points(Streamline *st)
   for (int i = 0; i < st->samples; i++) {
 
     SamplePoint *sample = &st->pts[i];
-    CellEntry *cell = new CellEntry (sample);
+    CellEntry *cell = new CellEntry(sample);
 
     int a = (int) (x_scale * sample->x);
     int b = (int) (y_scale * sample->y);
@@ -309,7 +309,7 @@ void RepelTable::add_all_points(Streamline *st)
       /* label the sample as head, tail or other */
       if (i == 0)
         sample->which_end = TAIL;
-      else if (i == st->samples-1)
+      else if (i == st->samples - 1)
         sample->which_end = HEAD;
       else
         sample->which_end = -1;
@@ -360,13 +360,13 @@ SamplePoint *RepelTable::find_nearest(float x, float y)
 
   for (int a = amin; a <= amax; a++)
     for (int b = bmin; b <= bmax; b++)
-      for (cell = cells[a%x_wrap][b%y_wrap]; cell != NULL; cell = cell->next) {
+      for (cell = cells[a % x_wrap][b % y_wrap]; cell != NULL; cell = cell->next) {
 
         s = cell->sample;
 
         float dx = x - s->x;
         float dy = y - s->y;
-        float dist = dx*dx + dy*dy;
+        float dist = dx * dx + dy * dy;
 
         /* closer than previous samples? */
 
@@ -463,19 +463,19 @@ Exit:
 ******************************************************************************/
 
 void RepelTable::find_new_centers(
-  Streamline *st1,
-  Streamline *st2,
-  Streamline *new_st,
-  float delta,
-  float& x1,
-  float& y1,
-  float& x2,
-  float& y2
+        Streamline *st1,
+        Streamline *st2,
+        Streamline *new_st,
+        float delta,
+        float &x1,
+        float &y1,
+        float &x2,
+        float &y2
 )
 {
   int i;
   int steps;
-  float x,y;
+  float x, y;
   float len;
   float ilen;
   float d;
@@ -490,11 +490,11 @@ void RepelTable::find_new_centers(
 
   len = 0.5 * st1->get_length();
   len = 0.5 * big_len - len;
-  steps = (int) fabs (len / delta);
+  steps = (int) fabs(len / delta);
   d = len / steps;
 
   for (i = 0; i < steps; i++)
-    ilen = vf->integrate (x, y, -d, 0, x, y);
+    ilen = vf->integrate(x, y, -d, 0, x, y);
 
   x1 = x;
   y1 = y;
@@ -506,11 +506,11 @@ void RepelTable::find_new_centers(
 
   len = 0.5 * st2->get_length();
   len = 0.5 * big_len - len;
-  steps = (int) fabs (len / delta);
+  steps = (int) fabs(len / delta);
   d = len / steps;
 
   for (i = 0; i < steps; i++)
-    ilen = vf->integrate (x, y, d, 0, x, y);
+    ilen = vf->integrate(x, y, d, 0, x, y);
 
   x2 = x;
   y2 = y;
@@ -535,17 +535,17 @@ Exit:
 ******************************************************************************/
 
 int RepelTable::identify_neighbors(
-  Bundle *bundle,
-  Window2d *win,
-  VectorField *vf,
-  Lowpass *low,
-  float& quality,
-  float delta,
-  int debug_print
+        Bundle *bundle,
+        Window2d *win,
+        VectorField *vf,
+        Lowpass *low,
+        float &quality,
+        float delta,
+        int debug_print
 )
 {
-  int a,b;
-  float len1,len2;
+  int a, b;
+  float len1, len2;
   int num_tries = 0;  /* number of attempts to join two streamlines */
   int orientation;
 
@@ -558,11 +558,11 @@ int RepelTable::identify_neighbors(
 #if 1
   /* do this in a random order */
   Dissolve rand_seq(bundle->num_lines, 1);
-  rand_seq.set_initial_value ((int) (bundle->num_lines * drand48()));
+  rand_seq.set_initial_value((int) (bundle->num_lines * drand48()));
   for (int i = 0; i < bundle->num_lines; i++) {
     int j = rand_seq.next_value();
     if (j < bundle->num_lines)
-      add_endpoints (bundle->get_line(j), 1, 1);
+      add_endpoints(bundle->get_line(j), 1, 1);
   }
 #endif
 
@@ -574,7 +574,7 @@ int RepelTable::identify_neighbors(
   /* see which streamlines are near enough to be joined */
 
   Dissolve rand_seq2(bundle->num_lines, 1);
-  rand_seq2.set_initial_value ((int) (bundle->num_lines * drand48()));
+  rand_seq2.set_initial_value((int) (bundle->num_lines * drand48()));
 
   for (int i = 0; i < bundle->num_lines; i++) {
 
@@ -598,7 +598,7 @@ int RepelTable::identify_neighbors(
       if (j == 0)
         sample = &st->pts[0];
       else
-        sample = &st->pts[st->samples-1];
+        sample = &st->pts[st->samples - 1];
 
       /* find out location and cell */
       float x = sample->x;
@@ -617,7 +617,7 @@ int RepelTable::identify_neighbors(
 
       for (int a = amin; a <= amax; a++)
         for (int b = bmin; b <= bmax; b++)
-          for (cell=cells[a%x_wrap][b%y_wrap]; cell != NULL; cell=cell->next) {
+          for (cell = cells[a % x_wrap][b % y_wrap]; cell != NULL; cell = cell->next) {
 
             s = cell->sample;
             Streamline *st2 = s->st;
@@ -634,7 +634,7 @@ int RepelTable::identify_neighbors(
 
             float dx = x - s->x;
             float dy = y - s->y;
-            float dist = dx*dx + dy*dy;
+            float dist = dx * dx + dy * dy;
             if (dist > dist_max)
               continue;
 
@@ -644,58 +644,57 @@ int RepelTable::identify_neighbors(
 
             /* delete the two streamlines and create a new one */
 
-            float len_a,len_b;
-            st->get_lengths (len_a, len_b);
+            float len_a, len_b;
+            st->get_lengths(len_a, len_b);
             len1 = len_a + len_b;
-            st2->get_lengths (len_a, len_b);
+            st2->get_lengths(len_a, len_b);
             len2 = len_a + len_b;
 
             /* weighted average of position, based on streamline lengths */
             float x_mid = (len1 * x + len2 * s->x) / (len1 + len2);
             float y_mid = (len1 * y + len2 * s->y) / (len1 + len2);
-            clamp_to_screen (x_mid, y_mid, vf->getaspect());
+            clamp_to_screen(x_mid, y_mid, vf->getaspect());
 
-if (debug_print) {
-  printf ("line 1: x,y = %f %f\n", x, y);
-  st->get_lengths (len_a, len_b);
-  printf ("len1 len2: %f %f\n", len_a, len_b);
-  printf ("\n");
+            if (debug_print) {
+              printf("line 1: x,y = %f %f\n", x, y);
+              st->get_lengths(len_a, len_b);
+              printf("len1 len2: %f %f\n", len_a, len_b);
+              printf("\n");
 
-  printf ("line 2: x,y = %f %f\n", s->x, s->y);
-  st2->get_lengths (len_a, len_b);
-  printf ("len1 len2: %f %f\n", len_a, len_b);
-  printf ("\n");
-}
+              printf("line 2: x,y = %f %f\n", s->x, s->y);
+              st2->get_lengths(len_a, len_b);
+              printf("len1 len2: %f %f\n", len_a, len_b);
+              printf("\n");
+            }
 
             /* determine lengths for new streamline */
             if (s->which_end == HEAD) {
               len1 = st->get_length();
               len2 = st2->get_length();
               orientation = 1;
-            }
-            else {
+            } else {
               len2 = st->get_length();
               len1 = st2->get_length();
               orientation = 2;
             }
 
             /* delete old streamlines */
-            low->delete_line (st);
-            low->delete_line (st2);
+            low->delete_line(st);
+            low->delete_line(st2);
             float delete_quality = low->current_quality();
 
             /* create new streamline */
 
-            Streamline *new_st = new Streamline (vf, x_mid, y_mid,
-              len1, len2, delta);
+            Streamline *new_st = new Streamline(vf, x_mid, y_mid,
+                                                len1, len2, delta);
 
-if (debug_print) {
-  printf ("new line: x,y = %f %f\n", x_mid, y_mid);
-  printf ("len1 len2: %f %f\n", len1, len2);
-  printf ("\n");
-}
+            if (debug_print) {
+              printf("new line: x,y = %f %f\n", x_mid, y_mid);
+              printf("len1 len2: %f %f\n", len1, len2);
+              printf("\n");
+            }
 
-            float new_quality = low->new_quality (new_st);
+            float new_quality = low->new_quality(new_st);
             num_tries++;
 
             /* if the join doesn't make the quality too bad, accept it */
@@ -711,12 +710,12 @@ if (debug_print) {
               /* maybe write to animation file */
               if (animation_flag) {
 
-                float x1,y1,x2,y2;
+                float x1, y1, x2, y2;
 
                 if (orientation == 1)
-                  find_new_centers (st2, st, new_st, delta, x2, y2, x1, y1);
+                  find_new_centers(st2, st, new_st, delta, x2, y2, x1, y1);
                 else
-                  find_new_centers (st, st2, new_st, delta, x1, y1, x2, y2);
+                  find_new_centers(st, st2, new_st, delta, x1, y1, x2, y2);
 
                 new_st->anim_index = anim_index++;
 
@@ -733,30 +732,29 @@ if (debug_print) {
               }
 
               /* finish deleting the old streamlines */
-              remove_streamline (st);
-              remove_streamline (st2);
+              remove_streamline(st);
+              remove_streamline(st2);
               delete st;
               delete st2;
 
               /* add streamline to the lowpass image */
-              low->add_line (new_st);
-              add_streamline (new_st);
-            
+              low->add_line(new_st);
+              add_streamline(new_st);
+
               if (num_tries > 2)
-                printf ("tried %d times to join streamlines\n", num_tries);
+                printf("tried %d times to join streamlines\n", num_tries);
 
               /* signal that we joined streamlines */
               return (1);
-            }
-            else {   /* otherwise revert to previous state */
+            } else {   /* otherwise revert to previous state */
 
               /* add back the old streamlines */
 
-              quality = low->new_quality (st);
-              low->add_line (st);
+              quality = low->new_quality(st);
+              low->add_line(st);
 
-              quality = low->new_quality (st2);
-              low->add_line (st2);
+              quality = low->new_quality(st2);
+              low->add_line(st2);
 
               return (0);
             }
@@ -765,7 +763,7 @@ if (debug_print) {
   }
 
   if (num_tries > 2)
-    printf ("tried %d times to join streamlines\n", num_tries);
+    printf("tried %d times to join streamlines\n", num_tries);
 
   /* if we get here, we didn't join any streamlines */
   return (0);

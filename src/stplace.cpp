@@ -44,6 +44,7 @@ warranty of merchantability or fitness for a particular purpose.
 extern void check_events();
 
 void interpreter();
+
 void new_interpreter();
 
 VectorField *vf = NULL;         /* the vector field we're visualizing */
@@ -174,29 +175,29 @@ int main(int argc, char *argv[])
 {
   char *s;
 
-  while(--argc > 0 && (*++argv)[0]=='-') {
-    for(s = argv[0]+1; *s; s++)
-      switch(*s) {
-	case 's':
-	  xsize = atoi (*++argv);
-	  ysize = atoi (*++argv);
-	  argc -= 2;
-	  break;
-	case 'g':
-	  graphics_flag = 1 - graphics_flag;
-	  break;
-	case 'v':
-	  verbose_flag = 1 - verbose_flag;
-	  break;
-	default:
-	  break;
+  while (--argc > 0 && (*++argv)[0] == '-') {
+    for (s = argv[0] + 1; *s; s++)
+      switch (*s) {
+        case 's':
+          xsize = atoi(*++argv);
+          ysize = atoi(*++argv);
+          argc -= 2;
+          break;
+        case 'g':
+          graphics_flag = 1 - graphics_flag;
+          break;
+        case 'v':
+          verbose_flag = 1 - verbose_flag;
+          break;
+        default:
+          break;
       }
   }
 
   /* read in a vector field */
 
   if (argc > 0) {
-    vf = new VectorField (*argv);
+    vf = new VectorField(*argv);
     float_reg = vf->get_magnitude();
     /* normalize the field */
     vf->normalize();
@@ -205,13 +206,13 @@ int main(int argc, char *argv[])
   /* set up graphics stuff */
 
   if (graphics_flag) {
-    win = new Window2d (xsize, ysize);
-    win->set_vscale (xsize / (float) ysize);
+    win = new Window2d(xsize, ysize);
+    win->set_vscale(xsize / (float) ysize);
     win->map();
     win->flush();
 
-    win2 = new Window2d (xsize, ysize);
-    win2->set_vscale (xsize / (float) ysize);
+    win2 = new Window2d(xsize, ysize);
+    win2->set_vscale(xsize / (float) ysize);
     win2->map();
     win2->flush();
   }
@@ -257,7 +258,7 @@ void draw_lowimage(Window2d *win, int x, int y)
   low->draw(win2);
 
   if (verbose_flag)
-    printf ("quality = %f\n", low->current_quality());
+    printf("quality = %f\n", low->current_quality());
 
   graph_the_quality = 0;
 }
@@ -285,7 +286,7 @@ void line_at_click(Window2d *win, int xx, int yy)
 
   float delta = 1.0 / (float) win->xsize;
 
-  float blen = vis_get_birth_length (x, y);
+  float blen = vis_get_birth_length(x, y);
   Streamline *st = new Streamline(vf, x, y, blen, delta);
   st->draw(win);
 }
@@ -297,8 +298,8 @@ Let user click to make field lines.
 
 void lines_of_field()
 {
-  win->makeicolor (20, 255, 255, 255);
-  win->set_color_index (20);
+  win->makeicolor(20, 255, 255, 255);
+  win->set_color_index(20);
 
   win->left_down(line_at_click);
   win->middle_down(clear_win);
@@ -320,8 +321,8 @@ void random_lines()
 {
   if (graphics_flag) {
     win->clear();
-    win->makeicolor (20, 255, 255, 255);
-    win->set_color_index (20);
+    win->makeicolor(20, 255, 255, 255);
+    win->set_color_index(20);
   }
 
   float len = 0.1;
@@ -330,7 +331,7 @@ void random_lines()
   for (int i = 0; i < 200; i++) {
     float x = drand48();
     float y = drand48();
-    Streamline *st = new Streamline (vf, x, y, len, delta);
+    Streamline *st = new Streamline(vf, x, y, len, delta);
     if (graphics_flag)
       st->draw(win);
   }
@@ -347,15 +348,15 @@ Entry:
 void line_test(int num)
 {
   win->clear();
-  win->makeicolor (BLACK, 0, 0, 0);
-  win->makeicolor (RED, 255, 0, 0);
-  win->makeicolor (WHITE, 255, 255, 255);
-  win->set_color_index (WHITE);
+  win->makeicolor(BLACK, 0, 0, 0);
+  win->makeicolor(RED, 255, 0, 0);
+  win->makeicolor(WHITE, 255, 255, 255);
+  win->set_color_index(WHITE);
 
   int xs = 100;
   int ys = 100;
 
-  low = new Lowpass (xs, ys, 2.0, target_lowpass);
+  low = new Lowpass(xs, ys, 2.0, target_lowpass);
 
   float quality = low->current_quality();
   float delta = 5.0 / (float) xsize;
@@ -371,7 +372,7 @@ void line_test(int num)
     float r = 0.25;
     float x = r * cos(theta) + 0.5;
     float y = r * sin(theta) + 0.5;
-    Streamline *st = new Streamline (vf, x, y, slen, delta);
+    Streamline *st = new Streamline(vf, x, y, slen, delta);
 
     /* measure quality of the low-pass image */
 
@@ -379,7 +380,7 @@ void line_test(int num)
 
     /* add streamline to image */
 
-    add_streamline (st);
+    add_streamline(st);
     low->add_line(st);
   }
 
@@ -400,34 +401,34 @@ Entry:
 ******************************************************************************/
 
 void postscript_draw_arrow(
-  ofstream *file_out,
-  float x,
-  float y,
-  float width,
-  float length,
-  int thickness,
-  int open
+        ofstream *file_out,
+        float x,
+        float y,
+        float width,
+        float length,
+        int thickness,
+        int open
 )
 {
   float len;
-  float dx,dy;
+  float dx, dy;
   float dt = 1.0 / win->xsize;   /* delta length for stepping along lines */
 
   /* find the base of the arrowhead */
 
-  int steps = (int) floor (length / dt);
+  int steps = (int) floor(length / dt);
   dt = length / steps;
 
   float xx = x;
   float yy = y;
 
   for (int i = 0; i < steps; i++)
-    vf->integrate (xx, yy, -dt, 1, xx, yy);
+    vf->integrate(xx, yy, -dt, 1, xx, yy);
 
 #if 1
   dx = x - xx;
   dy = y - yy;
-  len = sqrt (dx*dx + dy*dy);
+  len = sqrt(dx * dx + dy * dy);
   if (len != 0.0) {
     dx /= len;
     dy /= len;
@@ -448,8 +449,7 @@ void postscript_draw_arrow(
               << " ln" << endl;
     *file_out << x << " " << y << " " << x2 << " " << y2
               << " ln" << endl;
-  }
-  else {
+  } else {
     *file_out << "newpath " << x << " " << y << " moveto" << endl;
     *file_out << x1 << " " << y1 << " lineto" << endl;
     *file_out << x2 << " " << y2 << " lineto" << endl;
@@ -471,34 +471,34 @@ Entry:
 ******************************************************************************/
 
 void draw_arrow(
-  Window2d *win,
-  float x,
-  float y,
-  float width,
-  float length,
-  int thickness,
-  int open
+        Window2d *win,
+        float x,
+        float y,
+        float width,
+        float length,
+        int thickness,
+        int open
 )
 {
   float len;
-  float dx,dy;
+  float dx, dy;
   float dt = 1.0 / win->xsize;   /* delta length for stepping along lines */
 
   /* find the base of the arrowhead */
 
-  int steps = (int) floor (length / dt);
+  int steps = (int) floor(length / dt);
   dt = length / steps;
 
   float xx = x;
   float yy = y;
 
   for (int i = 0; i < steps; i++)
-    vf->integrate (xx, yy, -dt, 1, xx, yy);
+    vf->integrate(xx, yy, -dt, 1, xx, yy);
 
 #if 1
   dx = x - xx;
   dy = y - yy;
-  len = sqrt (dx*dx + dy*dy);
+  len = sqrt(dx * dx + dy * dy);
   if (len != 0.0) {
     dx /= len;
     dy /= len;
@@ -515,14 +515,13 @@ void draw_arrow(
   float y2 = yy + dx * width;
 
   if (open) {
-    win->thick_line (x, y, x1, y1, thickness);
-    win->thick_line (x, y, x2, y2, thickness);
-  }
-  else {
+    win->thick_line(x, y, x1, y1, thickness);
+    win->thick_line(x, y, x2, y2, thickness);
+  } else {
     win->polygon_start();
-    win->polygon_vertex (x, y);
-    win->polygon_vertex (x1, y1);
-    win->polygon_vertex (x2, y2);
+    win->polygon_vertex(x, y);
+    win->polygon_vertex(x1, y1);
+    win->polygon_vertex(x2, y2);
     win->polygon_fill();
   }
 }
@@ -539,15 +538,15 @@ Entry:
   head     - snap only to heads of streamlines?
 ******************************************************************************/
 
-void snap_arrows_to_streamlines (
-  int steps,
-  float width,
-  float length,
-  char *filename,
-  int head
+void snap_arrows_to_streamlines(
+        int steps,
+        float width,
+        float length,
+        char *filename,
+        int head
 )
 {
-  float x,y;
+  float x, y;
   float s;
 
   /* maybe open postscript file */
@@ -556,28 +555,28 @@ void snap_arrows_to_streamlines (
 
   if (filename) {
     file_out = new ofstream(filename);
-    write_postscript_start (file_out);
-    bundle->write_postscript (file_out);
+    write_postscript_start(file_out);
+    bundle->write_postscript(file_out);
   }
 
   /* set up drawing window stuff */
 
-  win->set_color_index (WHITE);
+  win->set_color_index(WHITE);
 
   /* create a hash table of all streamline samples */
 
   RepelTable *repel;
 
-  float min,max;
-  vis_get_separation_extrema (min, max);
+  float min, max;
+  vis_get_separation_extrema(min, max);
   repel = new RepelTable(vf, max * 2.0);
 
   for (int k = 0; k < bundle->num_lines; k++) {
     Streamline *st = bundle->get_line(k);
     if (head)
-      repel->add_endpoints (st, 1, 0);
+      repel->add_endpoints(st, 1, 0);
     else
-      repel->add_all_points (st);
+      repel->add_all_points(st);
   }
 
   /* parameters for hex grid */
@@ -607,29 +606,29 @@ void snap_arrows_to_streamlines (
 
       /* snap the arrowhead to the nearest streamline */
 
-      SamplePoint *point = repel->find_nearest (x, y);
+      SamplePoint *point = repel->find_nearest(x, y);
       if (point == NULL)
         continue;
 
       float nx = point->x;
       float ny = point->y;
-      s = vis_get_separation(nx,ny) / max;
+      s = vis_get_separation(nx, ny) / max;
 
       int thickness = 1;
       int steps = (int) (xsize * s * length);
       int open = (arrow_type == OPEN_ARROW);
       if (filename)
-        postscript_draw_arrow (file_out, nx, ny, s * width, s * length,
-                                    thickness, open);
+        postscript_draw_arrow(file_out, nx, ny, s * width, s * length,
+                              thickness, open);
       else
-        draw_arrow (win, nx, ny, s * width, s * length, thickness, open);
+        draw_arrow(win, nx, ny, s * width, s * length, thickness, open);
     }
   }
 
   win->flush();
 
   if (filename)
-    write_postscript_end (file_out);
+    write_postscript_end(file_out);
 }
 
 
@@ -642,15 +641,15 @@ Entry:
 
 void hexagonal_grid(int steps)
 {
-  float x,y;
+  float x, y;
   Streamline *st;
 
   bundle = new Bundle();
 
   if (graphics_flag) {
     win->clear();
-    win->makeicolor (20, 255, 255, 255);
-    win->set_color_index (20);
+    win->makeicolor(20, 255, 255, 255);
+    win->set_color_index(20);
   }
 
   float delta = delta_step;
@@ -673,8 +672,8 @@ void hexagonal_grid(int steps)
       else
         y = dist * (j + 0.75 + jy);
 
-      float blen = vis_get_birth_length (x, y);
-      st = new Streamline (vf, x, y, blen, delta);
+      float blen = vis_get_birth_length(x, y);
+      st = new Streamline(vf, x, y, blen, delta);
       bundle->add_line(st);
       if (graphics_flag)
         st->draw(win);
@@ -695,15 +694,15 @@ Entry:
 
 void square_grid(int steps)
 {
-  int i,j;
+  int i, j;
   Streamline *st;
 
   bundle = new Bundle();
 
   if (graphics_flag) {
     win->clear();
-    win->makeicolor (20, 255, 255, 255);
-    win->set_color_index (20);
+    win->makeicolor(20, 255, 255, 255);
+    win->set_color_index(20);
   }
 
   float delta = delta_step;
@@ -714,8 +713,8 @@ void square_grid(int steps)
       float jy = jitter * (drand48() - 0.5);
       float x = (i + 0.5 + jx) / steps;
       float y = (j + 0.5 + jy) / steps;
-      float blen = vis_get_birth_length (x, y);
-      st = new Streamline (vf, x, y, blen, delta);
+      float blen = vis_get_birth_length(x, y);
+      st = new Streamline(vf, x, y, blen, delta);
       bundle->add_line(st);
       if (graphics_flag)
         st->draw(win);
@@ -735,18 +734,18 @@ void good_random_lines()
 {
   if (graphics_flag) {
     win->clear();
-    win->makeicolor (BLACK, 0, 0, 0);
-    win->makeicolor (RED, 255, 0, 0);
-    win->makeicolor (WHITE, 255, 255, 255);
-    win->set_color_index (WHITE);
-    win->left_down (stop_events);
+    win->makeicolor(BLACK, 0, 0, 0);
+    win->makeicolor(RED, 255, 0, 0);
+    win->makeicolor(WHITE, 255, 255, 255);
+    win->set_color_index(WHITE);
+    win->left_down(stop_events);
   }
 
   int xs = vis_get_lowpass_xsize();
   int ys = vis_get_lowpass_ysize();
 
   /* create a lowpass image, to be used with a radial cubic filter */
-  low = new Lowpass (xs, ys, radius_lowpass, target_lowpass);
+  low = new Lowpass(xs, ys, radius_lowpass, target_lowpass);
 
   float quality = low->current_quality();
   float delta = delta_step;
@@ -758,8 +757,8 @@ void good_random_lines()
     /* create a random streamline */
     float x = drand48();
     float y = drand48();
-    float blen = vis_get_birth_length (x, y);
-    Streamline *st = new Streamline (vf, x, y, blen, delta);
+    float blen = vis_get_birth_length(x, y);
+    Streamline *st = new Streamline(vf, x, y, blen, delta);
 
     /* see whether it increases the quality of the low-pass image */
 
@@ -771,7 +770,7 @@ void good_random_lines()
       low->add_line(st);
       quality = new_quality;
       if (graphics_flag) {
-        win->set_color_index (WHITE);
+        win->set_color_index(WHITE);
         st->draw(win);
       }
     }
@@ -800,15 +799,15 @@ Exit:
   returns 1 if there were births, 0 if not
 ******************************************************************************/
 
-int streamline_birth (Lowpass *low)
+int streamline_birth(Lowpass *low)
 {
   int i;
   float quality;
   int had_births = 0;
 
   if (verbose_flag) {
-    printf (".");
-    fflush (stdout);
+    printf(".");
+    fflush(stdout);
   }
 
   float delta = delta_step;
@@ -824,7 +823,7 @@ int streamline_birth (Lowpass *low)
   /* add all the streamlines to this lowpass image */
   for (i = 0; i < temp_bundle->num_lines; i++) {
     quality = blur->new_quality(temp_bundle->get_line(i));
-    blur->add_line (temp_bundle->get_line(i));
+    blur->add_line(temp_bundle->get_line(i));
   }
 
   /* find places in this image that are too sparse, and try to */
@@ -838,16 +837,16 @@ int streamline_birth (Lowpass *low)
   for (i = 0; i < xs_blur * ys_blur; i++) {
 
     /* get new pseudo-random position in blur image */
-    int a,b;
-    dissolve.new_position (a, b);
+    int a, b;
+    dissolve.new_position(a, b);
     float x = (a + 0.5) / xs_blur;
     float y = (b + 0.5) / ys_blur * vf->getaspect();
 
-    if (blur->birth_test (x, y, birth_thresh)) {
+    if (blur->birth_test(x, y, birth_thresh)) {
 
       Streamline *birth_st;
-      float blen = vis_get_birth_length(x,y);
-      birth_st = new Streamline (vf, x, y, blen, delta);
+      float blen = vis_get_birth_length(x, y);
+      birth_st = new Streamline(vf, x, y, blen, delta);
 
       float new_quality = low->new_quality(birth_st);
 
@@ -855,12 +854,12 @@ int streamline_birth (Lowpass *low)
 
       if (new_quality <= quality) {
         quality = blur->new_quality(birth_st);
-        blur->add_line (birth_st);
+        blur->add_line(birth_st);
         quality = low->new_quality(birth_st);
-        low->add_line (birth_st);
+        low->add_line(birth_st);
         had_births = 1;
 
-        add_streamline (birth_st);
+        add_streamline(birth_st);
         quality = new_quality;
 
         if (animation_flag) {
@@ -871,15 +870,14 @@ int streamline_birth (Lowpass *low)
         }
 
         count++;
-      }
-      else
+      } else
         delete birth_st;
     }
   }
 
   if (count && verbose_flag) {
-    printf ("(%d)", count);
-    fflush (stdout);
+    printf("(%d)", count);
+    fflush(stdout);
   }
 
   /* free up memory */
@@ -894,13 +892,13 @@ int streamline_birth (Lowpass *low)
 
 static Dissolve *dissolve;
 static float birth_delta;
-static int xs_blur,ys_blur;
+static int xs_blur, ys_blur;
 
 /******************************************************************************
 Set things up for birthing new streamlines.
 ******************************************************************************/
 
-void streamline_birth_init (Lowpass *low)
+void streamline_birth_init(Lowpass *low)
 {
   int i;
 
@@ -923,21 +921,21 @@ Exit:
   returns 1 if there was a birth, 0 if not
 ******************************************************************************/
 
-int streamline_birth_trial (Lowpass *low)
+int streamline_birth_trial(Lowpass *low)
 {
   float quality = low->current_quality();
 
   /* get new pseudo-random position in blur image */
-  int a,b;
-  dissolve->new_position (a, b);
+  int a, b;
+  dissolve->new_position(a, b);
   float x = (a + 0.5) / xs_blur;
   float y = (b + 0.5) / ys_blur * vf->getaspect();
 
-  if (low->birth_test (x, y, birth_thresh)) {
+  if (low->birth_test(x, y, birth_thresh)) {
 
     Streamline *birth_st;
-    float blen = vis_get_birth_length(x,y);
-    birth_st = new Streamline (vf, x, y, blen, birth_delta);
+    float blen = vis_get_birth_length(x, y);
+    birth_st = new Streamline(vf, x, y, blen, birth_delta);
 
     float new_quality = low->new_quality(birth_st);
 
@@ -946,9 +944,9 @@ int streamline_birth_trial (Lowpass *low)
     if (new_quality <= quality) {
 
       quality = low->new_quality(birth_st);
-      low->add_line (birth_st);
+      low->add_line(birth_st);
 
-      add_streamline (birth_st);
+      add_streamline(birth_st);
       quality = new_quality;
 
       if (animation_flag) {
@@ -959,8 +957,7 @@ int streamline_birth_trial (Lowpass *low)
       }
 
       return (1);  /* signal that we got a birth */
-    }
-    else
+    } else
       delete birth_st;
   }
 
@@ -985,10 +982,10 @@ Exit:
 ******************************************************************************/
 
 int make_streamline_move(
-  int num,
-  Lowpass *low,
-  float &quality,
-  unsigned long int change
+        int num,
+        Lowpass *low,
+        float &quality,
+        unsigned long int change
 )
 {
   /* get the streamline to try changing */
@@ -997,16 +994,16 @@ int make_streamline_move(
 
   /* get info about the selected streamline */
 
-  float x,y;
-  st->get_origin (x, y);
+  float x, y;
+  st->get_origin(x, y);
 
-  float len1_orig,len2_orig;
-  st->get_lengths (len1_orig, len2_orig);
+  float len1_orig, len2_orig;
+  st->get_lengths(len1_orig, len2_orig);
 
   /* if deleting this streamline improves the quality, get rid */
   /* of it and return */
 
-  low->delete_line (st);
+  low->delete_line(st);
   float new_quality = low->current_quality();
 
   if (new_quality <= quality) {
@@ -1017,7 +1014,7 @@ int make_streamline_move(
                  << endl;
     }
 
-    remove_streamline (st);
+    remove_streamline(st);
     delete st;
     quality = new_quality;
     return (1);
@@ -1055,8 +1052,8 @@ int make_streamline_move(
   /* pick a new position */
 
   if (change & MOVE_CHANGE) {
-    x += vis_get_delta_move(x,y) * (drand48() - 0.5);
-    y += vis_get_delta_move(x,y) * (drand48() - 0.5);
+    x += vis_get_delta_move(x, y) * (drand48() - 0.5);
+    y += vis_get_delta_move(x, y) * (drand48() - 0.5);
   }
 
 #if 0
@@ -1072,11 +1069,9 @@ int make_streamline_move(
 
   if (change & HEAD_CHANGE) {
     which_end = HEAD;
-  }
-  else if (change & TAIL_CHANGE) {
+  } else if (change & TAIL_CHANGE) {
     which_end = TAIL;
-  }
-  else {
+  } else {
     if (drand48() < 0.5)
       which_end = HEAD;
     else
@@ -1088,16 +1083,16 @@ int make_streamline_move(
   float len1 = len1_orig;
   float len2 = len2_orig;
 
-  float xx,yy;
-  float delta_length1,delta_length2;
+  float xx, yy;
+  float delta_length1, delta_length2;
 
-  st->get_head(xx,yy);
-  delta_length1 = vis_get_delta_length(xx,yy);
-  st->get_tail(xx,yy);
-  delta_length2 = vis_get_delta_length(xx,yy);
+  st->get_head(xx, yy);
+  delta_length1 = vis_get_delta_length(xx, yy);
+  st->get_tail(xx, yy);
+  delta_length2 = vis_get_delta_length(xx, yy);
 
-  float taper_head,taper_tail;
-  st->get_taper (taper_head, taper_tail);
+  float taper_head, taper_tail;
+  st->get_taper(taper_head, taper_tail);
 
 #if 1
   /* maybe change tapering of intensity at ends */
@@ -1124,8 +1119,7 @@ int make_streamline_move(
       taper_head = taper_len / (len1_orig + len2_orig);
       len1 = taper_anchor + pivot * taper_len;
       len2 = len2_orig;
-    }
-    else if (!st->tail_clipped) {
+    } else if (!st->tail_clipped) {
 
       float pivot = drand48();
       float taper_len = taper_tail * (len1_orig + len2_orig);
@@ -1226,8 +1220,7 @@ int make_streamline_move(
       len1 = len1_orig - delta_length1 * drand48();
       if (len1 < 0)
         len1 = delta_length1 * drand48();
-    }
-    else {
+    } else {
       len2 = len2_orig - delta_length2 * drand48();
       if (len2 < 0)
         len2 = delta_length2 * drand48();
@@ -1254,12 +1247,12 @@ int make_streamline_move(
   if (y > 1 - tiny) y = 1 - tiny;
 #endif
 
-  clamp_to_screen (x, y, vf->getaspect());
+  clamp_to_screen(x, y, vf->getaspect());
 
   float delta = delta_step;
-set_taper (taper_head, taper_tail);
-  Streamline *new_st = new Streamline (vf, x, y, len1, len2, delta);
-set_taper (0.0, 0.0);
+  set_taper(taper_head, taper_tail);
+  Streamline *new_st = new Streamline(vf, x, y, len1, len2, delta);
+  set_taper(0.0, 0.0);
   new_quality = low->new_quality(new_st);
 
   /* see if this new one is better than the old one */
@@ -1269,18 +1262,17 @@ set_taper (0.0, 0.0);
     if (animation_flag) {
       new_st->anim_index = st->anim_index;
       *anim_file << "change " << st->anim_index << " "
-                 << x << " " << y << " " << (len1+len2)
+                 << x << " " << y << " " << (len1 + len2)
                  << endl;
     }
 
-    low->add_line (new_st);  /* add new one */
-    remove_streamline (st);
-    add_streamline (new_st);
+    low->add_line(new_st);  /* add new one */
+    remove_streamline(st);
+    add_streamline(new_st);
     delete st;
     quality = new_quality;
-  }
-  else {
-    low->add_line (st);      /* add back old one */
+  } else {
+    low->add_line(st);      /* add back old one */
     delete new_st;
   }
 
@@ -1301,7 +1293,7 @@ Exit:
   returns 1 if we had to delete the streamline, 0 otherwise
 ******************************************************************************/
 
-int move_streamline(int num, Lowpass *low, float& quality)
+int move_streamline(int num, Lowpass *low, float &quality)
 {
   int result;
   unsigned long int change = 0;
@@ -1317,11 +1309,9 @@ int move_streamline(int num, Lowpass *low, float& quality)
 
   if (pick < odds_move) {
     change |= MOVE_CHANGE;
-  }
-  else if (pick < odds_move + odds_len) {
+  } else if (pick < odds_move + odds_len) {
     change |= LEN_CHANGE;
-  }
-  else {
+  } else {
     change |= MOVE_CHANGE;
     change |= LEN_CHANGE;
   }
@@ -1337,13 +1327,13 @@ int move_streamline(int num, Lowpass *low, float& quality)
       change |= LONG_ONE;
     else if (pick < odds_short_one + odds_long_one + odds_short_both)
       change |= SHORT_BOTH;
-    else if (pick < odds_short_one+odds_long_one+odds_short_both+odds_long_both)
+    else if (pick < odds_short_one + odds_long_one + odds_short_both + odds_long_both)
       change |= LONG_BOTH;
     else
       change |= ALL_LEN;
   }
 
-  result = make_streamline_move (num, low, quality, change);
+  result = make_streamline_move(num, low, quality, change);
 
   return (result);
 }
@@ -1383,8 +1373,8 @@ void draw_graph_quality(float q, Window2d *win)
   float graph_xnew = graph_x + graph_x_delta;
 
   if (graph_x > 0) {
-    win->set_color_index (WHITE);
-    win->line (graph_x, graph_y, graph_xnew, graph_ynew); 
+    win->set_color_index(WHITE);
+    win->line(graph_x, graph_y, graph_xnew, graph_ynew);
   }
 
   graph_x = graph_xnew;
@@ -1407,8 +1397,8 @@ void graph_show_join(Window2d *win)
   float x = graph_x;
   float y1 = graph_y + graph_x_delta * 4;
   float y2 = graph_y + graph_x_delta * 6;
-  win->set_color_index (RED);
-  win->line (x, y1, x, y2); 
+  win->set_color_index(RED);
+  win->line(x, y1, x, y2);
 }
 
 
@@ -1424,8 +1414,8 @@ void graph_show_birth(Window2d *win)
   float x = graph_x;
   float y1 = graph_y + graph_x_delta * 6;
   float y2 = graph_y + graph_x_delta * 8;
-  win->set_color_index (GREEN);
-  win->line (x, y1, x, y2); 
+  win->set_color_index(GREEN);
+  win->line(x, y1, x, y2);
 }
 
 
@@ -1497,8 +1487,8 @@ void draw_streamline_quality(Window2d *win, int x, int y)
   for (i = 0; i < bundle->num_lines; i++) {
     Streamline *st = bundle->get_line(i);
     float t = (qualities[i] - min) / (max - min);
-    win2->set_color_index ((int) (255 * t));
-    st->draw_helper (win2, 0);
+    win2->set_color_index((int) (255 * t));
+    st->draw_helper(win2, 0);
   }
 
   win2->flush();
@@ -1525,7 +1515,7 @@ void initialize_streamline_quality()
   bundle->quality_sort();
 
   if (verbose_flag)
-    printf ("streamlines have been sorted by priority\n");
+    printf("streamlines have been sorted by priority\n");
 }
 
 
@@ -1564,12 +1554,12 @@ void examine_streamline_quality(float &quality)
   /* find out how it should be changed */
 
   unsigned long int change = 0;
-  change = low->recommend_change (bundle->get_line(poor_index));
+  change = low->recommend_change(bundle->get_line(poor_index));
 
   /* try out the change */
 
   quality = low->current_quality();
-  int result = make_streamline_move (poor_index, low, quality, change);
+  int result = make_streamline_move(poor_index, low, quality, change);
 
   /* re-evaluate some streamline qualities at random */
 
@@ -1581,7 +1571,7 @@ void examine_streamline_quality(float &quality)
   }
 
   /* do some sorting passes */
-  bundle->sort_passes (2);
+  bundle->sort_passes(2);
 }
 
 
@@ -1596,10 +1586,10 @@ void improve_lines(int num)
   if (graphics_flag) {
     win->clear();
     win->gray_ramp();
-    win->set_color_index (WHITE);
-    win->left_down (stop_events);
-    win->middle_down (draw_lowimage);
-    win->right_down (draw_streamline_quality);
+    win->set_color_index(WHITE);
+    win->left_down(stop_events);
+    win->middle_down(draw_lowimage);
+    win->right_down(draw_streamline_quality);
   }
 
   /* maybe start writing an animation file */
@@ -1612,15 +1602,15 @@ void improve_lines(int num)
   int ys = vis_get_lowpass_ysize();
 
   if (verbose_flag)
-    printf ("lowpass size = %d %d\n", xs, ys);
+    printf("lowpass size = %d %d\n", xs, ys);
 
   /* create a lowpass image, to be used with a radial cubic filter */
-  low = new Lowpass (xs, ys, radius_lowpass, target_lowpass);
+  low = new Lowpass(xs, ys, radius_lowpass, target_lowpass);
 
   /* add all the streamlines to this lowpass image */
   for (i = 0; i < bundle->num_lines; i++) {
     float quality = low->new_quality(bundle->get_line(i));
-    low->add_line (bundle->get_line(i));
+    low->add_line(bundle->get_line(i));
   }
 
   float quality = low->current_quality();
@@ -1634,24 +1624,24 @@ void improve_lines(int num)
     repel = new RepelTable(vf, join_dist);
     float radius = radius_lowpass / vis_get_lowpass_xsize();
     if (verbose_flag) {
-      printf ("max join distance = %f\n", join_dist);
-      printf ("radius = %f\n", radius);
+      printf("max join distance = %f\n", join_dist);
+      printf("radius = %f\n", radius);
     }
   }
 
   if (graphics_flag) {
     win2->clear();
-    win2->makeicolor (WHITE, 255, 255, 255);
-    win2->set_color_index (WHITE);
+    win2->makeicolor(WHITE, 255, 255, 255);
+    win2->set_color_index(WHITE);
 
-    win->set_color_index (WHITE);
-    low->draw_lines (win);
+    win->set_color_index(WHITE);
+    low->draw_lines(win);
   }
 
   if (verbose_flag) {
-    printf ("\n");
-    printf ("%d streamlines\n", low->bundle->num_lines);
-    printf ("\n");
+    printf("\n");
+    printf("%d streamlines\n", low->bundle->num_lines);
+    printf("\n");
   }
 
   quality = low->current_quality();
@@ -1660,22 +1650,22 @@ void improve_lines(int num)
   initialize_streamline_quality();
 
   /* get ready for streamline births */
-  streamline_birth_init (low);
+  streamline_birth_init(low);
 
   /* see if we want some new streamlines to be born */
   if (generation > 0) {
     for (i = 0; i < xs_blur * ys_blur; i++)
-      streamline_birth_trial (low);
+      streamline_birth_trial(low);
     quality = low->current_quality();
   }
 
   if (graph_the_quality) {
     win2->clear();
-    win2->makeicolor (RED, 255, 0, 0);
-    win2->makeicolor (GREEN, 0, 255, 0);
-    win2->makeicolor (WHITE, 255, 255, 255);
-    win2->set_color_index (WHITE);
-    init_graph_quality (quality);
+    win2->makeicolor(RED, 255, 0, 0);
+    win2->makeicolor(GREEN, 0, 255, 0);
+    win2->makeicolor(WHITE, 255, 255, 255);
+    win2->set_color_index(WHITE);
+    init_graph_quality(quality);
   }
 
   /* try to improve the positions of the streamlines */
@@ -1689,49 +1679,49 @@ void improve_lines(int num)
 
     int pick;
     do {
-      pick = (int) floor (drand48() * low->bundle->num_lines);
+      pick = (int) floor(drand48() * low->bundle->num_lines);
     } while (low->bundle->get_line(pick)->frozen == 1);
 
     /* move it around one or more times */
 
     if (low->bundle->num_lines > 0)
       for (i = 0; i < move_times; i++)
-        if (move_streamline (pick, low, quality))
+        if (move_streamline(pick, low, quality))
           break;
 
     /* check the events and maybe break loop */
     check_events();
     if (!keep_reading_events) {
       if (verbose_flag)
-        printf ("\nstopped after %d iterations\n", k);
+        printf("\nstopped after %d iterations\n", k);
 
       break;
     }
 
     /* see if we want some new streamlines to be born */
     if (generation > 0) {
-      int had_birth = streamline_birth_trial (low);
+      int had_birth = streamline_birth_trial(low);
       quality = low->current_quality();
       if (had_birth)
-        graph_show_birth (win2);
+        graph_show_birth(win2);
     }
 
     /* look for endpoints to join */
 
     if (join_dist > 0.0) {
       int debug_it = 0;
-      int did_join = repel->identify_neighbors (low->bundle, win, vf,
-                                                low, quality, delta, debug_it);
+      int did_join = repel->identify_neighbors(low->bundle, win, vf,
+                                               low, quality, delta, debug_it);
       if (graph_the_quality && did_join)
-        graph_show_join (win2);
+        graph_show_join(win2);
     }
 
     /* look for streamlines that have poor quality, and try to change them */
     if (quality_guide)
-      examine_streamline_quality (quality);
+      examine_streamline_quality(quality);
 
     if (graph_the_quality)
-      draw_graph_quality (quality, win2);
+      draw_graph_quality(quality, win2);
 
 //    if (last_quality < quality * 0.95)
 //      printf ("big jump, iteration %d\n", k);
@@ -1762,10 +1752,10 @@ void old_improve_lines(int num)
   if (graphics_flag) {
     win->clear();
     win->gray_ramp();
-    win->set_color_index (WHITE);
-    win->left_down (stop_events);
-    win->middle_down (draw_lowimage);
-    win->right_down (draw_streamline_quality);
+    win->set_color_index(WHITE);
+    win->left_down(stop_events);
+    win->middle_down(draw_lowimage);
+    win->right_down(draw_streamline_quality);
   }
 
   /* maybe start writing an animation file */
@@ -1778,15 +1768,15 @@ void old_improve_lines(int num)
   int ys = vis_get_lowpass_ysize();
 
   if (verbose_flag)
-    printf ("lowpass size = %d %d\n", xs, ys);
+    printf("lowpass size = %d %d\n", xs, ys);
 
   /* create a lowpass image, to be used with a radial cubic filter */
-  low = new Lowpass (xs, ys, radius_lowpass, target_lowpass);
+  low = new Lowpass(xs, ys, radius_lowpass, target_lowpass);
 
   /* add all the streamlines to this lowpass image */
   for (i = 0; i < bundle->num_lines; i++) {
     float quality = low->new_quality(bundle->get_line(i));
-    low->add_line (bundle->get_line(i));
+    low->add_line(bundle->get_line(i));
   }
 
   float quality = low->current_quality();
@@ -1800,8 +1790,8 @@ void old_improve_lines(int num)
     repel = new RepelTable(vf, join_dist);
     float radius = radius_lowpass / vis_get_lowpass_xsize();
     if (verbose_flag) {
-      printf ("max join distance = %f\n", join_dist);
-      printf ("radius = %f\n", radius);
+      printf("max join distance = %f\n", join_dist);
+      printf("radius = %f\n", radius);
     }
   }
 
@@ -1814,17 +1804,17 @@ void old_improve_lines(int num)
 
   if (graphics_flag) {
     win2->clear();
-    win2->makeicolor (WHITE, 255, 255, 255);
-    win2->set_color_index (WHITE);
+    win2->makeicolor(WHITE, 255, 255, 255);
+    win2->set_color_index(WHITE);
 
-    win->set_color_index (WHITE);
-    low->draw_lines (win);
+    win->set_color_index(WHITE);
+    low->draw_lines(win);
   }
 
   if (verbose_flag) {
-    printf ("\n");
-    printf ("%d streamlines\n", low->bundle->num_lines);
-    printf ("\n");
+    printf("\n");
+    printf("%d streamlines\n", low->bundle->num_lines);
+    printf("\n");
   }
 
   quality = low->current_quality();
@@ -1834,17 +1824,17 @@ void old_improve_lines(int num)
 
   /* see if we want some new streamlines to be born */
   if (generation > 0) {
-    (void) streamline_birth (low);
+    (void) streamline_birth(low);
     quality = low->current_quality();
   }
 
   if (graph_the_quality) {
     win2->clear();
-    win2->makeicolor (RED, 255, 0, 0);
-    win2->makeicolor (GREEN, 0, 255, 0);
-    win2->makeicolor (WHITE, 255, 255, 255);
-    win2->set_color_index (WHITE);
-    init_graph_quality (quality);
+    win2->makeicolor(RED, 255, 0, 0);
+    win2->makeicolor(GREEN, 0, 255, 0);
+    win2->makeicolor(WHITE, 255, 255, 255);
+    win2->set_color_index(WHITE);
+    init_graph_quality(quality);
   }
 
   /* try to improve the positions of the streamlines */
@@ -1858,41 +1848,41 @@ void old_improve_lines(int num)
 
     int pick;
     do {
-      pick = (int) floor (drand48() * low->bundle->num_lines);
+      pick = (int) floor(drand48() * low->bundle->num_lines);
     } while (low->bundle->get_line(pick)->frozen == 1);
 
     /* move it around one or more times */
 
     if (low->bundle->num_lines > 0)
       for (i = 0; i < move_times; i++)
-        if (move_streamline (pick, low, quality))
+        if (move_streamline(pick, low, quality))
           break;
 
     /* check the events and maybe break loop */
     check_events();
     if (!keep_reading_events) {
       if (verbose_flag)
-        printf ("\nstopped after %d iterations\n", k);
+        printf("\nstopped after %d iterations\n", k);
 
       break;
     }
 
     /* see if we want some new streamlines to be born */
     if (generation > 0 && k > 0 && k % generation == 0) {
-      int had_birth = streamline_birth (low);
+      int had_birth = streamline_birth(low);
       quality = low->current_quality();
       if (had_birth)
-        graph_show_birth (win2);
+        graph_show_birth(win2);
     }
 
     /* look for endpoints to join */
 
     if (join_dist > 0.0) {
       int debug_it = 0;
-      int did_join = repel->identify_neighbors (low->bundle, win, vf,
-                                                low, quality, delta, debug_it);
+      int did_join = repel->identify_neighbors(low->bundle, win, vf,
+                                               low, quality, delta, debug_it);
       if (graph_the_quality && did_join)
-        graph_show_join (win2);
+        graph_show_join(win2);
     }
 
 #if 0
@@ -1907,10 +1897,10 @@ void old_improve_lines(int num)
 
     /* look for streamlines that have poor quality, and try to change them */
     if (quality_guide)
-      examine_streamline_quality (quality);
+      examine_streamline_quality(quality);
 
     if (graph_the_quality)
-      draw_graph_quality (quality, win2);
+      draw_graph_quality(quality, win2);
 
 //    if (last_quality < quality * 0.95)
 //      printf ("big jump, iteration %d\n", k);
@@ -1941,11 +1931,11 @@ void taper_optimize()
   taper_delta = 0.1;
 
   rmove = 0;
-  vis_set_join_factor (0);
+  vis_set_join_factor(0);
 
-  improve_lines (999999);
+  improve_lines(999999);
 
-  set_taper (0.0, 0.0);
+  set_taper(0.0, 0.0);
 }
 
 
@@ -1972,8 +1962,8 @@ void optimize_streamlines(float sep_target)
   taper_max = 0;
   taper_delta = 0;
 
-  vis_set_join_factor (1);
-  vis_set_delta_length (1.125);
+  vis_set_join_factor(1);
+  vis_set_delta_length(1.125);
 
   target_lowpass = 1.0;
 
@@ -1988,8 +1978,8 @@ void optimize_streamlines(float sep_target)
 
   while (fabs(sep - sep_target) > 0.0001) {
 
-    vis_set_separation (sep);
-    vis_set_birth_length (len);
+    vis_set_separation(sep);
+    vis_set_birth_length(len);
     generation = gen;
 
     gen *= 2;
@@ -1997,7 +1987,7 @@ void optimize_streamlines(float sep_target)
     sep *= 0.5;
   }
 
-  improve_lines (999999);
+  improve_lines(999999);
 }
 
 
@@ -2024,8 +2014,8 @@ void cascaded_improve(float sep_target)
   taper_max = 0;
   taper_delta = 0;
 
-  vis_set_join_factor (1);
-  vis_set_delta_length (1.125);
+  vis_set_join_factor(1);
+  vis_set_delta_length(1.125);
 
   target_lowpass = 1.0;
 
@@ -2040,11 +2030,11 @@ void cascaded_improve(float sep_target)
 
   while (fabs(sep - sep_target) > 0.0001) {
 
-    vis_set_separation (sep);
-    vis_set_birth_length (len);
+    vis_set_separation(sep);
+    vis_set_birth_length(len);
     generation = gen;
 
-    improve_lines (999999);
+    improve_lines(999999);
 
     gen *= 2;
     len *= 0.5;
@@ -2070,15 +2060,15 @@ void tufts(float sep, float len)
   taper_max = 0;
   taper_delta = 0;
 
-  vis_set_join_factor (0);
-  vis_set_delta_length (0.0);
+  vis_set_join_factor(0);
+  vis_set_delta_length(0.0);
 
-  vis_set_separation (sep);
-  vis_set_birth_length (len);
+  vis_set_separation(sep);
+  vis_set_birth_length(len);
 
   target_lowpass = 0.6;
 
-  improve_lines (999999);
+  improve_lines(999999);
 }
 
 
@@ -2090,37 +2080,37 @@ void four_test()
 {
   if (graphics_flag) {
     win->clear();
-    win->makeicolor (BLACK, 0, 0, 0);
-    win->makeicolor (RED, 255, 0, 0);
-    win->makeicolor (WHITE, 255, 255, 255);
-    win->set_color_index (WHITE);
-    win->left_down (stop_events);
+    win->makeicolor(BLACK, 0, 0, 0);
+    win->makeicolor(RED, 255, 0, 0);
+    win->makeicolor(WHITE, 255, 255, 255);
+    win->set_color_index(WHITE);
+    win->left_down(stop_events);
   }
 
   int xs = vis_get_lowpass_xsize();
   int ys = vis_get_lowpass_ysize();
 
   /* create a lowpass image, to be used with a radial cubic filter */
-  low = new Lowpass (xs, ys, radius_lowpass, target_lowpass);
+  low = new Lowpass(xs, ys, radius_lowpass, target_lowpass);
 
   /* add all the streamlines to this lowpass image */
   for (int i = 0; i < bundle->num_lines; i++)
-    low->add_line (bundle->get_line(i));
+    low->add_line(bundle->get_line(i));
 
   float delta = delta_step;
 
   if (graphics_flag) {
     win2->clear();
-    win2->makeicolor (WHITE, 255, 255, 255);
-    win2->set_color_index (WHITE);
-    low->draw_lines (win);
-    low->draw_lines (win2);
+    win2->makeicolor(WHITE, 255, 255, 255);
+    win2->set_color_index(WHITE);
+    low->draw_lines(win);
+    low->draw_lines(win2);
   }
 
   if (verbose_flag) {
-    printf ("\n");
-    printf ("%d streamlines\n", low->bundle->num_lines);
-    printf ("\n");
+    printf("\n");
+    printf("%d streamlines\n", low->bundle->num_lines);
+    printf("\n");
   }
 
   /* try to improve the positions of the streamlines */
@@ -2134,49 +2124,48 @@ void four_test()
       /* get a streamline to improve */
 
       Streamline *st = low->bundle->get_line(i);
-      float x,y;
-      st->get_origin (x, y);
+      float x, y;
+      st->get_origin(x, y);
       float length = st->get_length();
 
       /* create two new streamlines in orthogonal directions */
 
       float eps = epsilon * radius_lowpass / vis_get_lowpass_xsize();
 
-      Streamline *new_x0 = new Streamline (vf, x - eps, y, length, delta);
-      Streamline *new_x1 = new Streamline (vf, x + eps, y, length, delta);
-      Streamline *new_y0 = new Streamline (vf, x, y - eps, length, delta);
-      Streamline *new_y1 = new Streamline (vf, x, y + eps, length, delta);
+      Streamline *new_x0 = new Streamline(vf, x - eps, y, length, delta);
+      Streamline *new_x1 = new Streamline(vf, x + eps, y, length, delta);
+      Streamline *new_y0 = new Streamline(vf, x, y - eps, length, delta);
+      Streamline *new_y1 = new Streamline(vf, x, y + eps, length, delta);
 
       /* see what the correct direction to move is */
 
       float quality = low->current_quality();
 
-      low->delete_line (st);
+      low->delete_line(st);
       float x_quality = low->new_quality(new_x1) - low->new_quality(new_x0);
       float y_quality = low->new_quality(new_y1) - low->new_quality(new_y0);
 
       float dmove = rmove * radius_lowpass / vis_get_lowpass_xsize();
       x += dmove * x_quality;
       y += dmove * y_quality;
-      Streamline *new_st = new Streamline (vf, x, y, length, delta);
-printf ("q qx qy, x y: %f %f %f, %f %f ", quality, x_quality, y_quality, x, y);
+      Streamline *new_st = new Streamline(vf, x, y, length, delta);
+      printf("q qx qy, x y: %f %f %f, %f %f ", quality, x_quality, y_quality, x, y);
       float new_quality = low->new_quality(new_st);
 
       if (new_quality <= quality) {
-        low->add_line (new_st);
+        low->add_line(new_st);
         if (graphics_flag) {
-          win->set_color_index (BLACK);
+          win->set_color_index(BLACK);
           st->draw(win);
-          win->set_color_index (WHITE);
+          win->set_color_index(WHITE);
           new_st->draw(win);
         }
 //      delete st;
-printf ("new\n");
-      }
-      else {
-        low->add_line (st);      /* add back old one */
+        printf("new\n");
+      } else {
+        low->add_line(st);      /* add back old one */
         delete new_st;
-printf ("old\n");
+        printf("old\n");
       }
 
       delete new_x0;
@@ -2195,7 +2184,7 @@ printf ("old\n");
 
   here: /* for jumping out of loop */
 
-  printf ("done with four-test\n");
+  printf("done with four-test\n");
 }
 
 
@@ -2209,15 +2198,15 @@ void repel(int num)
 
   if (graphics_flag) {
     win->clear();
-    win->makeicolor (BLACK, 0, 0, 0);
-    win->makeicolor (WHITE, 255, 255, 255);
-    win->set_color_index (WHITE);
-    win->left_down (stop_events);
+    win->makeicolor(BLACK, 0, 0, 0);
+    win->makeicolor(WHITE, 255, 255, 255);
+    win->set_color_index(WHITE);
+    win->left_down(stop_events);
 
     win2->clear();
-    win2->makeicolor (WHITE, 255, 255, 255);
-    win2->set_color_index (WHITE);
-    bundle->draw (win2);
+    win2->makeicolor(WHITE, 255, 255, 255);
+    win2->set_color_index(WHITE);
+    bundle->draw(win2);
   }
 
   Bundle *old_bundle = bundle->copy();
@@ -2236,9 +2225,9 @@ void repel(int num)
     /* draw new bundle */
     if (graphics_flag)
       for (i = 0; i < old_bundle->num_lines; i++) {
-        win->set_color_index (BLACK);
+        win->set_color_index(BLACK);
         old_bundle->get_line(i)->draw(win);
-        win->set_color_index (WHITE);
+        win->set_color_index(WHITE);
         bundle->get_line(i)->draw(win);
       }
 
@@ -2254,8 +2243,8 @@ void repel(int num)
     /* maybe break loop */
     if (!keep_reading_events) {
       if (verbose_flag) {
-        printf ("\n");
-        printf ("stopped after %d iterations\n", k);
+        printf("\n");
+        printf("stopped after %d iterations\n", k);
       }
       break;
     }
@@ -2315,13 +2304,13 @@ Entry:
 ******************************************************************************/
 
 void draw_dashes(
-  Window2d *win,
-  char *filename,
-  Bundle *bundle,
-  float len,
-  float separation,
-  float arrow_length,
-  float arrow_width
+        Window2d *win,
+        char *filename,
+        Bundle *bundle,
+        float len,
+        float separation,
+        float arrow_length,
+        float arrow_width
 )
 {
   int i;
@@ -2351,20 +2340,19 @@ void draw_dashes(
 
     *file_out << "1 72 div size div setlinewidth" << endl;
     *file_out << "/sw { 72 div size div setlinewidth } def" << endl;
-  }
-  else {
+  } else {
     win->clear();
-    win->set_color_index (WHITE);
+    win->set_color_index(WHITE);
   }
 
   for (i = 0; i < bundle->num_lines; i++) {
     Streamline *st = bundle->get_line(i);
     if (vis_arrow_length_varies())
-      st->variable_draw_dashed (win, file_out, separation,
-                                arrow_length, arrow_width);
+      st->variable_draw_dashed(win, file_out, separation,
+                               arrow_length, arrow_width);
     else
-      st->draw_dashed (win, file_out, len, separation,
-                       arrow_length, arrow_width);
+      st->draw_dashed(win, file_out, len, separation,
+                      arrow_length, arrow_width);
   }
 
   if (filename) {
@@ -2397,19 +2385,19 @@ Calculate the magnitude of a dipole, or some variant of it.
 
 void dipole_magnitude()
 {
-  int i,j,k;
+  int i, j, k;
   int size = 64;
   float val;
 
   if (float_reg)
     delete float_reg;
-  float_reg = new FloatImage (size, size);
+  float_reg = new FloatImage(size, size);
 
   for (i = 0; i < size; i++)
     for (j = 0; j < size; j++) {
 
-      float x = i / (float) (size-1);
-      float y = j / (float) (size-1);
+      float x = i / (float) (size - 1);
+      float y = j / (float) (size - 1);
       float sum = 0;
 
       for (k = 0; k < ncharges; k++) {
@@ -2417,7 +2405,7 @@ void dipole_magnitude()
         float dy = y - cy[k];
 
         float r2 = dx * dx + dy * dy;
-        float r = sqrt (r2);
+        float r = sqrt(r2);
 
 //        val += (1 - r);
 
@@ -2430,7 +2418,7 @@ void dipole_magnitude()
         sum += val;
       }
 
-      float_reg->pixel(i,j) = sum;
+      float_reg->pixel(i, j) = sum;
     }
 }
 
@@ -2444,28 +2432,28 @@ void make_lowpass_image(int size, char *filename)
   int i;
   float min = 0;
   float max = 2.0;
-  int xs,ys;
+  int xs, ys;
 
   xs = size;
   ys = size;
 
   float s = size / (float) vis_get_lowpass_xsize();
 
-  vis_set_minimum_blur (radius_lowpass * s);
+  vis_set_minimum_blur(radius_lowpass * s);
 
   /* create a lowpass image, to be used with a radial cubic filter */
-  low = new Lowpass (xs, ys, radius_lowpass, target_lowpass);
+  low = new Lowpass(xs, ys, radius_lowpass, target_lowpass);
 
   /* add all the streamlines to this lowpass image */
   for (i = 0; i < bundle->num_lines; i++) {
     float quality = low->new_quality(bundle->get_line(i));
-    low->add_line (bundle->get_line(i));
+    low->add_line(bundle->get_line(i));
   }
 
   FloatImage *img = low->get_image_ptr();
-  img->write_pgm (filename, min, max);
+  img->write_pgm(filename, min, max);
 
-  vis_set_minimum_blur (radius_lowpass);
+  vis_set_minimum_blur(radius_lowpass);
 }
 
 #if 0
@@ -2571,822 +2559,615 @@ the various functions.  Use at your own risk!
 
 void interpreter()
 {
-  int i,j;
+  int i, j;
   char filename[80];
   int grid_num = 40;
   float grid_dist = 0.3;
 
-  START_CLI ("stplace","cli")
+  START_CLI ("stplace", "cli")
 
-  COMMAND ("vload filename") {
-    get_parameter (filename);
-    vf = new VectorField (filename);
-    float_reg = vf->get_magnitude();
-    vf->normalize();
-  }
-
-  COMMAND ("vsave filename (xsize)") {
-    int res;
-    get_parameter (filename);
-    get_integer (&res);
-    if (res == 0)
-      res = vf->xsize;
-    VectorField *vtemp = new VectorField (res, res);
-    for (int i = 0; i < res; i++)
-      for (int j = 0; j < res; j++) {
-        float s = i / (float) res;
-        float t = j / (float) res;
-        vtemp->xval(i,j) = vf->xval(s,t);
-        vtemp->yval(i,j) = vf->yval(s,t);
-      }
-    vtemp->write_file (filename);
-    delete vtemp;
-  }
-
-  COMMAND ("vflip") {
-    for (int i = 0; i < vf->xsize; i++)
-      for (int j = 0; j < vf->ysize / 2; j++) {
-        int jj = vf->ysize - j - 1;
-        float tx = vf->xval(i,j);
-        float ty = vf->yval(i,j);
-        vf->xval(i,j) = vf->xval(i,jj);
-        vf->yval(i,j) = vf->yval(i,jj);
-        vf->xval(i,jj) = tx;
-        vf->yval(i,jj) = ty;
-      }
-  }
-
-  COMMAND ("hflip") {
-    for (int i = 0; i < vf->xsize / 2; i++)
-      for (int j = 0; j < vf->ysize; j++) {
-        int ii = vf->xsize - i - 1;
-        float tx = vf->xval(i,j);
-        float ty = vf->yval(i,j);
-        vf->xval(i,j) = vf->xval(ii,j);
-        vf->yval(i,j) = vf->yval(ii,j);
-        vf->xval(ii,j) = tx;
-        vf->yval(ii,j) = ty;
-      }
-  }
-
-  COMMAND ("xyswap") {
-    for (int i = 0; i < vf->xsize; i++)
-      for (int j = 0; j < vf->ysize; j++) {
-        float temp = vf->xval(i,j);
-        vf->xval(i,j) = vf->yval(i,j);
-        vf->yval(i,j) = temp;
-      }
-  }
-
-  COMMAND ("vscale  x y") {
-    float xs,ys;
-    get_real (&xs);
-    get_real (&ys);
-    for (int i = 0; i < vf->xsize; i++)
-      for (int j = 0; j < vf->ysize; j++) {
-        vf->xval(i,j) *= xs;
-        vf->yval(i,j) *= ys;
-      }
-  }
-
-  COMMAND ("vcut  xorg yorg size") {
-    int xs,ys;
-    int size;
-    get_integer (&xs);
-    get_integer (&ys);
-    get_integer (&size);
-    VectorField *vf2 = new VectorField (size, size);
-    for (int i = 0; i < size; i++)
-      for (int j = 0; j < size; j++) {
-        vf2->xval(i,j) = vf->xval(i + xs, j + ys);
-        vf2->yval(i,j) = vf->yval(i + xs, j + ys);
-      }
-    delete vf;
-    vf = vf2;
-  }
-
-  COMMAND ("vrotate  degrees") {
-    float theta;
-    get_real (&theta);
-    theta *= 3.1415926535 / 180.0;
-    float cs = cos (theta);
-    float sn = sin (theta);
-    for (int i = 0; i < vf->xsize; i++)
-      for (int j = 0; j < vf->ysize; j++) {
-        float x = vf->xval(i,j);
-        float y = vf->yval(i,j);
-        vf->xval(i,j) =  cs * x + sn * y;
-        vf->yval(i,j) = -sn * x + cs * y;
-      }
-  }
-
-  COMMAND ("vstretch  xmag") {
-
-    float xmag;
-    get_real (&xmag);
-
-    int xs = vf->xsize;
-    int xsize = (int) (xs * xmag);
-    int ysize = xs;
-
-    VectorField *vf2 = new VectorField (xsize, ysize);
-
-    for (int i = 0; i < xsize; i++)
-      for (int j = 0; j < ysize; j++) {
-        float xx = i / (float) (xsize-1);
-        float yy = j / (float) (ysize-1);
-        yy *= xmag;
-        if (yy > 1)
-          yy = 0.99;
-        vf2->xval(i,j) = vf->xval(xx,yy);
-        vf2->yval(i,j) = vf->yval(xx,yy);
-      }
-
-    delete vf;
-    vf = vf2;
-  }
-
-  COMMAND ("gradient") {
-    if (vf)
+    COMMAND ("vload filename") {
+      get_parameter(filename);
+      vf = new VectorField(filename);
+      float_reg = vf->get_magnitude();
+      vf->normalize();
+    } COMMAND ("vsave filename (xsize)") {
+      int res;
+      get_parameter(filename);
+      get_integer(&res);
+      if (res == 0)
+        res = vf->xsize;
+      VectorField *vtemp = new VectorField(res, res);
+      for (int i = 0; i < res; i++)
+        for (int j = 0; j < res; j++) {
+          float s = i / (float) res;
+          float t = j / (float) res;
+          vtemp->xval(i, j) = vf->xval(s, t);
+          vtemp->yval(i, j) = vf->yval(s, t);
+        }
+      vtemp->write_file(filename);
+      delete vtemp;
+    } COMMAND ("vflip") {
+      for (int i = 0; i < vf->xsize; i++)
+        for (int j = 0; j < vf->ysize / 2; j++) {
+          int jj = vf->ysize - j - 1;
+          float tx = vf->xval(i, j);
+          float ty = vf->yval(i, j);
+          vf->xval(i, j) = vf->xval(i, jj);
+          vf->yval(i, j) = vf->yval(i, jj);
+          vf->xval(i, jj) = tx;
+          vf->yval(i, jj) = ty;
+        }
+    } COMMAND ("hflip") {
+      for (int i = 0; i < vf->xsize / 2; i++)
+        for (int j = 0; j < vf->ysize; j++) {
+          int ii = vf->xsize - i - 1;
+          float tx = vf->xval(i, j);
+          float ty = vf->yval(i, j);
+          vf->xval(i, j) = vf->xval(ii, j);
+          vf->yval(i, j) = vf->yval(ii, j);
+          vf->xval(ii, j) = tx;
+          vf->yval(ii, j) = ty;
+        }
+    } COMMAND ("xyswap") {
+      for (int i = 0; i < vf->xsize; i++)
+        for (int j = 0; j < vf->ysize; j++) {
+          float temp = vf->xval(i, j);
+          vf->xval(i, j) = vf->yval(i, j);
+          vf->yval(i, j) = temp;
+        }
+    } COMMAND ("vscale  x y") {
+      float xs, ys;
+      get_real(&xs);
+      get_real(&ys);
+      for (int i = 0; i < vf->xsize; i++)
+        for (int j = 0; j < vf->ysize; j++) {
+          vf->xval(i, j) *= xs;
+          vf->yval(i, j) *= ys;
+        }
+    } COMMAND ("vcut  xorg yorg size") {
+      int xs, ys;
+      int size;
+      get_integer(&xs);
+      get_integer(&ys);
+      get_integer(&size);
+      VectorField *vf2 = new VectorField(size, size);
+      for (int i = 0; i < size; i++)
+        for (int j = 0; j < size; j++) {
+          vf2->xval(i, j) = vf->xval(i + xs, j + ys);
+          vf2->yval(i, j) = vf->yval(i + xs, j + ys);
+        }
       delete vf;
-    vf = new VectorField (float_reg->getwidth(), float_reg->getheight());
-    for (int i = 0; i < float_reg->getwidth(); i++)
-      for (int j = 0; j < float_reg->getheight(); j++) {
-        float gx,gy;
-        float x = i / (float) float_reg->getwidth();
-        float y = j / (float) float_reg->getheight();
-        float_reg->gradient (x, y, &gx, &gy);
-        vf->xval(i,j) = gx;
-        vf->yval(i,j) = gy;
-      }
-    vf->normalize();
-  }
+      vf = vf2;
+    } COMMAND ("vrotate  degrees") {
+      float theta;
+      get_real(&theta);
+      theta *= 3.1415926535 / 180.0;
+      float cs = cos(theta);
+      float sn = sin(theta);
+      for (int i = 0; i < vf->xsize; i++)
+        for (int j = 0; j < vf->ysize; j++) {
+          float x = vf->xval(i, j);
+          float y = vf->yval(i, j);
+          vf->xval(i, j) = cs * x + sn * y;
+          vf->yval(i, j) = -sn * x + cs * y;
+        }
+    } COMMAND ("vstretch  xmag") {
 
-  COMMAND ("streamline xorg yorg len1 len2 (taper_tail taper_head)") {
-    float x,y,len1,len2;
-    float tail,head;
-    float delta = delta_step;
-    Streamline *st;
-    get_real (&x);
-    get_real (&y);
-    get_real (&len1);
-    get_real (&len2);
-    get_real (&tail);
-    get_real (&head);
-    if (tail != 0.0 || head != 0.0) {
-      set_taper (head, tail);
-      st = new Streamline(vf, x, y, len1, len2, delta);
-    }
-    else
-      st = new Streamline(vf, x, y, len1, len2, delta);
-    bundle->add_line (st);
-  }
+      float xmag;
+      get_real(&xmag);
 
-  COMMAND ("snap_arrows  num_across width length") {
-    int num;
-    float width,length;
-    get_integer (&num);
-    get_real (&width);
-    get_real (&length);
-    snap_arrows_to_streamlines (num, width, length, NULL, 0);
-  }
+      int xs = vf->xsize;
+      int xsize = (int) (xs * xmag);
+      int ysize = xs;
 
-  COMMAND ("hsnap_arrows  num_across width length") {
-    int num;
-    float width,length;
-    get_integer (&num);
-    get_real (&width);
-    get_real (&length);
-    snap_arrows_to_streamlines (num, width, length, NULL, 1);
-  }
+      VectorField *vf2 = new VectorField(xsize, ysize);
 
-  COMMAND ("psnap_arrows  num_across width length file") {
-    int num;
-    float width,length;
-    get_integer (&num);
-    get_real (&width);
-    get_real (&length);
-    get_parameter (filename);
-    snap_arrows_to_streamlines (num, width, length, filename, 0);
-  }
+      for (int i = 0; i < xsize; i++)
+        for (int j = 0; j < ysize; j++) {
+          float xx = i / (float) (xsize - 1);
+          float yy = j / (float) (ysize - 1);
+          yy *= xmag;
+          if (yy > 1)
+            yy = 0.99;
+          vf2->xval(i, j) = vf->xval(xx, yy);
+          vf2->yval(i, j) = vf->yval(xx, yy);
+        }
 
-  COMMAND ("hpsnap_arrows  num_across width length file") {
-    int num;
-    float width,length;
-    get_integer (&num);
-    get_real (&width);
-    get_real (&length);
-    get_parameter (filename);
-    snap_arrows_to_streamlines (num, width, length, filename, 1);
-  }
-
-  COMMAND ("squares num_across") {
-    int num;
-    get_integer (&num);
-    if (num != 0)
-      grid_num = num;
-    square_grid (grid_num);
-  }
-
-  COMMAND ("hexagons num_across") {
-    int num;
-    get_integer (&num);
-    if (num != 0)
-      grid_num = num;
-    hexagonal_grid (grid_num);
-  }
-
-  COMMAND ("jitter value") {
-    get_real (&jitter);
-  }
-
-  COMMAND ("lines") {
-    lines_of_field();
-  }
-
-  COMMAND ("random_lines") {
-    random_lines();
-  }
-
-  COMMAND ("good_lines") {
-    good_random_lines();
-  }
-
-  COMMAND ("improve_lines  {num}") {
-    int num;
-    get_integer (&num);
-    if (num == 0)
+      delete vf;
+      vf = vf2;
+    } COMMAND ("gradient") {
+      if (vf)
+        delete vf;
+      vf = new VectorField(float_reg->getwidth(), float_reg->getheight());
+      for (int i = 0; i < float_reg->getwidth(); i++)
+        for (int j = 0; j < float_reg->getheight(); j++) {
+          float gx, gy;
+          float x = i / (float) float_reg->getwidth();
+          float y = j / (float) float_reg->getheight();
+          float_reg->gradient(x, y, &gx, &gy);
+          vf->xval(i, j) = gx;
+          vf->yval(i, j) = gy;
+        }
+      vf->normalize();
+    } COMMAND ("streamline xorg yorg len1 len2 (taper_tail taper_head)") {
+      float x, y, len1, len2;
+      float tail, head;
+      float delta = delta_step;
+      Streamline *st;
+      get_real(&x);
+      get_real(&y);
+      get_real(&len1);
+      get_real(&len2);
+      get_real(&tail);
+      get_real(&head);
+      if (tail != 0.0 || head != 0.0) {
+        set_taper(head, tail);
+        st = new Streamline(vf, x, y, len1, len2, delta);
+      } else
+        st = new Streamline(vf, x, y, len1, len2, delta);
+      bundle->add_line(st);
+    } COMMAND ("snap_arrows  num_across width length") {
+      int num;
+      float width, length;
+      get_integer(&num);
+      get_real(&width);
+      get_real(&length);
+      snap_arrows_to_streamlines(num, width, length, NULL, 0);
+    } COMMAND ("hsnap_arrows  num_across width length") {
+      int num;
+      float width, length;
+      get_integer(&num);
+      get_real(&width);
+      get_real(&length);
+      snap_arrows_to_streamlines(num, width, length, NULL, 1);
+    } COMMAND ("psnap_arrows  num_across width length file") {
+      int num;
+      float width, length;
+      get_integer(&num);
+      get_real(&width);
+      get_real(&length);
+      get_parameter(filename);
+      snap_arrows_to_streamlines(num, width, length, filename, 0);
+    } COMMAND ("hpsnap_arrows  num_across width length file") {
+      int num;
+      float width, length;
+      get_integer(&num);
+      get_real(&width);
+      get_real(&length);
+      get_parameter(filename);
+      snap_arrows_to_streamlines(num, width, length, filename, 1);
+    } COMMAND ("squares num_across") {
+      int num;
+      get_integer(&num);
+      if (num != 0)
+        grid_num = num;
+      square_grid(grid_num);
+    } COMMAND ("hexagons num_across") {
+      int num;
+      get_integer(&num);
+      if (num != 0)
+        grid_num = num;
+      hexagonal_grid(grid_num);
+    } COMMAND ("jitter value") {
+      get_real(&jitter);
+    } COMMAND ("lines") {
+      lines_of_field();
+    } COMMAND ("random_lines") {
+      random_lines();
+    } COMMAND ("good_lines") {
+      good_random_lines();
+    } COMMAND ("improve_lines  {num}") {
+      int num;
+      get_integer(&num);
+      if (num == 0)
+        improve_lines(999999);
+      else
+        improve_lines(num);
+    } COMMAND ("optimize  separation") {
+      float sep;
+      get_real(&sep);
+      optimize_streamlines(sep);
+    } COMMAND ("cascade  separation") {
+      float sep;
+      get_real(&sep);
+      cascaded_improve(sep);
+    } COMMAND ("tufts  separation  length") {
+      float sep, len;
+      get_real(&sep);
+      get_real(&len);
+      tufts(sep, len);
+    } COMMAND ("four_test") {
+      four_test();
+    } COMMAND ("repel") {
+      int num;
+      get_integer(&num);
+      if (num == 0)
+        repel(999999);
+      else
+        repel(num);
+    } COMMAND ("better_lines") {
+      good_random_lines();
       improve_lines(999999);
-    else
-      improve_lines(num);
-  }
-
-  COMMAND ("optimize  separation") {
-    float sep;
-    get_real (&sep);
-    optimize_streamlines(sep);
-  }
-
-  COMMAND ("cascade  separation") {
-    float sep;
-    get_real (&sep);
-    cascaded_improve(sep);
-  }
-
-  COMMAND ("tufts  separation  length") {
-    float sep,len;
-    get_real (&sep);
-    get_real (&len);
-    tufts (sep, len);
-  }
-
-  COMMAND ("four_test") {
-    four_test();
-  }
-
-  COMMAND ("repel") {
-    int num;
-    get_integer (&num);
-    if (num == 0)
-      repel(999999);
-    else
-      repel(num);
-  }
-
-  COMMAND ("better_lines") {
-    good_random_lines();
-    improve_lines(999999);
-  }
-
-  COMMAND ("target_lowpass  value") {
-    get_real (&target_lowpass);
-  }
-
-  COMMAND ("separation  value") {
-    float sep;
-    get_real (&sep);
-    vis_set_separation(sep);
-  }
-
-  COMMAND ("radius  value") {
-    get_real (&radius_lowpass);
-    vis_set_minimum_blur(radius_lowpass);
-  }
-
-  COMMAND ("length  value") {
-    float slen;
-    get_real (&slen);
-    vis_set_birth_length (slen);
-  }
-
-  COMMAND ("vlength  off/on") {
-    int flag;
-    flag = get_boolean();
-    vis_vary_birth_length (flag);
-  }
-
-  COMMAND ("dlen  value") {
-    float dl;
-    get_real (&dl);
-    vis_set_delta_length (dl);
-  }
-
-  COMMAND ("jtimes  value") {
-    get_integer (&move_times);
-  }
-
-  COMMAND ("death_length  value") {
-    get_real (&death_length);
-  }
-
-  COMMAND ("birth_thresh  value") {
-    get_real (&birth_thresh);
-  }
-
-  COMMAND ("birth_blur  value") {
-    get_real (&birth_blur);
-  }
-
-  COMMAND ("generation  value") {
-    get_integer (&generation);
-  }
-
-  COMMAND ("join_factor  value") {
-    float join;
-    get_real (&join);
-    vis_set_join_factor (join);
-  }
-
-  COMMAND ("rmove  value") {
-    get_real (&rmove);
-  }
-
-  COMMAND ("epsilon  value") {
-    get_real (&epsilon);
-  }
-
-  COMMAND ("lsize  value") {
-    get_integer (&lowpass_size);
-printf ("lsize is an obsolete command!\n");
-  }
-
-  COMMAND ("rplace  value") {
-    get_integer (&random_place_count);
-  }
-
-  COMMAND ("sradius  value") {
-    get_real (&sample_radius);
-  }
-
-  COMMAND ("end_dist  value") {
-    get_real (&sample_endpoint_distance);
-  }
-
-  COMMAND ("nsamples  value") {
-    get_integer (&sample_number);
-  }
-
-  COMMAND ("show_samples  off/on") {
-    show_samples = get_boolean();
-  }
-
-  COMMAND ("quality_guide  off/on") {
-    quality_guide = get_boolean();
-  }
-
-  COMMAND ("freeze") {
-    freeze_bundle();
-  }
-
-  COMMAND ("unfreeze") {
-    unfreeze_bundle();
-  }
-
-  COMMAND ("arrow (0 = none, 1 = open, 2 = closed) length width") {
-    int type;
-    float length,width;
-    get_integer (&type);
-    get_real (&length);
-    get_real (&width);
-    set_arrow (type, length, width, (int) (length * xsize));
-    arrow_type = type;
-  }
-
-  COMMAND ("reduce_length  start  end") {
-    int start,end;
-    get_integer (&start);
-    get_integer (&end);
-    set_reduction (start, end);
-  }
-
-  COMMAND ("intensity  value") {
-    float val;
-    get_real (&val);
-    set_intensity (val);
-  }
-
-  COMMAND ("mtaper  max_val") {
-    get_real (&taper_max);
-  }
-
-  COMMAND ("dtaper  delta") {
-    get_real (&taper_delta);
-  }
-
-  COMMAND ("odds  move length both") {
-    get_real (&odds_move);
-    get_real (&odds_len);
-    get_real (&odds_both);
-
-    /* normalize the odds */
-    float sum = odds_move + odds_len + odds_both;
-    odds_move /= sum;
-    odds_len /= sum;
-    odds_both /= sum;
-
-printf ("odds: %f %f %f\n", odds_move, odds_len, odds_both);
-  }
-
-  COMMAND ("lodds  all long_both short_both long_one short_one") {
-    get_real (&odds_all_len);
-    get_real (&odds_long_both);
-    get_real (&odds_short_both);
-    get_real (&odds_long_one);
-    get_real (&odds_short_one);
-
-    /* normalize the odds */
-    float sum = odds_long_both + odds_short_both +
-                odds_long_one + odds_short_one + odds_all_len;
-    odds_all_len    /= sum;
-    odds_long_both  /= sum;
-    odds_short_both /= sum;
-    odds_long_one   /= sum;
-    odds_short_one  /= sum;
-  }
-
-  COMMAND ("pgm filename (img_size)") {
-    get_parameter (filename);
-    int num;
-    get_integer (&num);
-    if (num == 0)
-      bundle->write_pgm (filename, xsize, ysize);
-    else
-      bundle->write_pgm (filename, num, num);
-  }
-
-  COMMAND ("write_streamlines filename") {
-    get_parameter (filename);
-    if (taper_max > 0)
-      bundle->write_ascii (filename, 1);
-    else
-      bundle->write_ascii (filename, 0);
-  }
-
-  COMMAND ("wlowpass   min max filename") {
-    float min,max;
-    get_real (&min);
-    get_real (&max);
-    get_parameter (filename);
-    FloatImage *img = low->get_image_ptr();
-    img->write_pgm (filename, min, max);
-  }
-
-  COMMAND ("lowpass  imgsize  filename") {
-    int isize;
-    get_integer (&isize);
-    get_parameter (filename);
-    make_lowpass_image (isize, filename);
-  }
-
-  COMMAND ("postscript filename") {
-    get_parameter (filename);
-    ofstream file_out (filename);
-    write_postscript_start (&file_out);
-    bundle->write_postscript (&file_out);
-    write_postscript_end (&file_out);
-  }
-
-  COMMAND ("draw_streamlines") {
-    win->clear();
-    win->makeicolor (BLACK, 0, 0, 0);
-    win->makeicolor (WHITE, 255, 255, 255);
-    win->set_color_index (WHITE);
-    bundle->draw(win);
-  }
-
-  COMMAND ("thickness  line_width") {
-    float w;
-    get_real (&w);
-    set_line_thickness (w);
-  }
-
-  COMMAND ("render_streamlines  radius") {
-    float rad;
-    get_real (&rad);
-    if (rad == 0.0) rad = 2.0;
-    FloatImage *tmp = bundle->filtered_render(xsize, ysize, rad);
-    win->gray_ramp();
-    tmp->draw_clamped (win, 0.0, 1.1);
-    delete tmp;
-  }
-
-  COMMAND ("dashes  length separation arrow_length arrow_width") {
-    float length;
-    float separation;
-    float len,width;
-    get_real (&length);
-    get_real (&separation);
-    get_real (&len);
-    get_real (&width);
-    draw_dashes (win2, NULL, bundle, length, separation, len, width);
-  }
-
-  COMMAND ("pdashes  length separation arrow_length arrow_width filename") {
-    float length;
-    float separation;
-    float len,width;
-    get_real (&length);
-    get_real (&separation);
-    get_real (&len);
-    get_real (&width);
-    get_parameter (filename);
-    draw_dashes (win2, filename, bundle, length, separation, len, width);
-  }
-
-  COMMAND ("idashes  off/on (vary dash intensity?)") {
-    vary_arrow_intensity = get_boolean();
-  }
-
-  COMMAND ("vorticity  grid_size") {
-    int size;
-    get_integer (&size);
-    if (size == 0)
-      size = 256;
-    FloatImage *image = vf->get_vorticity (size, size);
-    win2->gray_ramp();
-    image->draw (win2);
-  }
-
-  COMMAND ("divergence  grid_size") {
-    int size;
-    get_integer (&size);
-    if (size == 0)
-      size = 256;
-    FloatImage *image = vf->get_divergence (size, size);
-    win2->gray_ramp();
-    image->draw (win2);
-  }
-
-  COMMAND ("fload  filename") {
-    get_parameter (filename);
-    float_reg->read_file (filename);
-  }
-
-  COMMAND ("fsave  filename") {
-    get_parameter (filename);
-    float_reg->write_file (filename);
-  }
-
-  COMMAND ("floadpgm  filename") {
-    get_parameter (filename);
-    float_reg->read_pgm (filename);
-  }
-
-  COMMAND ("fsavepgm  filename") {
-    get_parameter (filename);
-    float_reg->write_pgm (filename, 0.0, 1.1);
-  }
-
-  COMMAND ("fdraw") {
-    float_reg->draw(win);
-  }
-
-  COMMAND ("frender (radius)") {
-    float rad;
-    get_real (&rad);
-    if (rad == 0.0)
-      rad = 2.0;
-    if (float_reg != NULL)
-      delete float_reg;
-    float_reg = bundle->filtered_render(xsize, ysize, rad);
-    win->gray_ramp();
-    float_reg->draw_clamped (win, 0.0, 1.1);
-  }
-
-  COMMAND ("fmap  min max") {
-    float min,max;
-    get_real (&min);
-    get_real (&max);
-    float_reg->remap (min, max);
-  }
-
-  COMMAND ("fflip") {
-    for (i = 0; i < float_reg->getsize(); i++)
-      float_reg->pixel(i) = -1 * float_reg->pixel(i);
-  }
-
-  COMMAND ("fbias  val") {
-    float val;
-    get_real (&val);
-    float_reg->bias(val);
-  }
-
-  COMMAND ("fgain  val") {
-    float val;
-    get_real (&val);
-    float_reg->gain(val);
-  }
-
-  COMMAND ("fseparation") {
-    if (float_reg)
-      vis_set_variable_separation(float_reg);
-  }
-
-  COMMAND ("fwidth  min max") {
-
-    float min,max;
-    get_real (&min);
-    get_real (&max);
-
-    if (min == max || max == 0.0)
-      vis_set_draw_width (min);
-
-    if (float_reg)
-      vis_set_draw_width (float_reg, min, max);
-    else
-      fprintf (stderr, "No values in floating point register\n");
-  }
-
-  COMMAND ("flength  min max") {
-
-    float min,max;
-    get_real (&min);
-    get_real (&max);
-
-    if (min == max || max == 0.0)
-      vis_set_arrow_length (min);
-
-    if (float_reg)
-      vis_set_arrow_length (float_reg, min, max);
-    else
-      fprintf (stderr, "No values in floating point register\n");
-  }
-
-  COMMAND ("fmagnitude filename") {
-    get_parameter (filename);
-    VectorField *vtemp = new VectorField (filename);
-    float_reg = vtemp->get_magnitude();
-    delete vtemp;
-  }
-
-  COMMAND ("fconstant") {
-    if (float_reg)
-      delete float_reg;
-    float_reg = new FloatImage(20,20);
-    float_reg->setimage (1.0);
-  }
-
-  COMMAND ("framp") {
-    int size = 20;
-    FloatImage *img = new FloatImage(size,size);
-    for (i = 0; i < size; i++)
-      for (j = 0; j < size; j++)
-        img->pixel(i,j) = i / (float) (size-1);
-    if (float_reg)
-      delete float_reg;
-    float_reg = img->copy();
-  }
-
-  COMMAND ("fnoise  size blur_steps") {
-    int size;
-    int steps;
-    get_integer (&size);
-    get_integer (&steps);
-
-    if (float_reg)
-      delete float_reg;
-    float_reg = new FloatImage(size,size);
-
-    for (i = 0; i < size; i++)
-      for (j = 0; j < size; j++)
-        float_reg->pixel(i,j) = drand48();
-
-    float_reg->blur (steps);
-  }
-
-  COMMAND ("fcombine (vector-field and float_reg)") {
-    for (j = 0; j < vf->ysize; j++)
-      for (i = 0; i < vf->xsize; i++) {
-        float s = i / (float) vf->xsize;
-        float t = j / (float) vf->ysize;
-        float mag = float_reg->get_value(s,t);
-        vf->xval(i,j) = vf->xval(i,j) * mag;
-        vf->yval(i,j) = vf->yval(i,j) * mag;
-    }
-  }
-
-  COMMAND ("fblur  steps") {
-    int steps;
-    get_integer (&steps);
-    float_reg->blur (steps);
-  }
-
-  COMMAND ("fdipole") {
-    dipole_magnitude();
-  }
-
-  COMMAND ("bdraw") {
-    win->clear();
-    win->makeicolor (BLACK, 0, 0, 0);
-    win->makeicolor (WHITE, 255, 255, 255);
-    win->set_color_index (WHITE);
-    bundle->draw(win);
-    bundle2->draw(win);
-  }
-
-  COMMAND ("bcopy") {
-    bundle2 = bundle;
-  }
-
-  COMMAND ("bclear") {
-    bundle = new Bundle();
-  }
-
-  COMMAND ("intersect") {
-    win->makeicolor (BLACK, 0, 0, 0);
-    win->makeicolor (RED, 255, 0, 0);
-    win->makeicolor (WHITE, 255, 255, 255);
+    } COMMAND ("target_lowpass  value") {
+      get_real(&target_lowpass);
+    } COMMAND ("separation  value") {
+      float sep;
+      get_real(&sep);
+      vis_set_separation(sep);
+    } COMMAND ("radius  value") {
+      get_real(&radius_lowpass);
+      vis_set_minimum_blur(radius_lowpass);
+    } COMMAND ("length  value") {
+      float slen;
+      get_real(&slen);
+      vis_set_birth_length(slen);
+    } COMMAND ("vlength  off/on") {
+      int flag;
+      flag = get_boolean();
+      vis_vary_birth_length(flag);
+    } COMMAND ("dlen  value") {
+      float dl;
+      get_real(&dl);
+      vis_set_delta_length(dl);
+    } COMMAND ("jtimes  value") {
+      get_integer(&move_times);
+    } COMMAND ("death_length  value") {
+      get_real(&death_length);
+    } COMMAND ("birth_thresh  value") {
+      get_real(&birth_thresh);
+    } COMMAND ("birth_blur  value") {
+      get_real(&birth_blur);
+    } COMMAND ("generation  value") {
+      get_integer(&generation);
+    } COMMAND ("join_factor  value") {
+      float join;
+      get_real(&join);
+      vis_set_join_factor(join);
+    } COMMAND ("rmove  value") {
+      get_real(&rmove);
+    } COMMAND ("epsilon  value") {
+      get_real(&epsilon);
+    } COMMAND ("lsize  value") {
+      get_integer(&lowpass_size);
+      printf("lsize is an obsolete command!\n");
+    } COMMAND ("rplace  value") {
+      get_integer(&random_place_count);
+    } COMMAND ("sradius  value") {
+      get_real(&sample_radius);
+    } COMMAND ("end_dist  value") {
+      get_real(&sample_endpoint_distance);
+    } COMMAND ("nsamples  value") {
+      get_integer(&sample_number);
+    } COMMAND ("show_samples  off/on") {
+      show_samples = get_boolean();
+    } COMMAND ("quality_guide  off/on") {
+      quality_guide = get_boolean();
+    } COMMAND ("freeze") {
+      freeze_bundle();
+    } COMMAND ("unfreeze") {
+      unfreeze_bundle();
+    } COMMAND ("arrow (0 = none, 1 = open, 2 = closed) length width") {
+      int type;
+      float length, width;
+      get_integer(&type);
+      get_real(&length);
+      get_real(&width);
+      set_arrow(type, length, width, (int) (length * xsize));
+      arrow_type = type;
+    } COMMAND ("reduce_length  start  end") {
+      int start, end;
+      get_integer(&start);
+      get_integer(&end);
+      set_reduction(start, end);
+    } COMMAND ("intensity  value") {
+      float val;
+      get_real(&val);
+      set_intensity(val);
+    } COMMAND ("mtaper  max_val") {
+      get_real(&taper_max);
+    } COMMAND ("dtaper  delta") {
+      get_real(&taper_delta);
+    } COMMAND ("odds  move length both") {
+      get_real(&odds_move);
+      get_real(&odds_len);
+      get_real(&odds_both);
+
+      /* normalize the odds */
+      float sum = odds_move + odds_len + odds_both;
+      odds_move /= sum;
+      odds_len /= sum;
+      odds_both /= sum;
+
+      printf("odds: %f %f %f\n", odds_move, odds_len, odds_both);
+    } COMMAND ("lodds  all long_both short_both long_one short_one") {
+      get_real(&odds_all_len);
+      get_real(&odds_long_both);
+      get_real(&odds_short_both);
+      get_real(&odds_long_one);
+      get_real(&odds_short_one);
+
+      /* normalize the odds */
+      float sum = odds_long_both + odds_short_both +
+                  odds_long_one + odds_short_one + odds_all_len;
+      odds_all_len /= sum;
+      odds_long_both /= sum;
+      odds_short_both /= sum;
+      odds_long_one /= sum;
+      odds_short_one /= sum;
+    } COMMAND ("pgm filename (img_size)") {
+      get_parameter(filename);
+      int num;
+      get_integer(&num);
+      if (num == 0)
+        bundle->write_pgm(filename, xsize, ysize);
+      else
+        bundle->write_pgm(filename, num, num);
+    } COMMAND ("write_streamlines filename") {
+      get_parameter(filename);
+      if (taper_max > 0)
+        bundle->write_ascii(filename, 1);
+      else
+        bundle->write_ascii(filename, 0);
+    } COMMAND ("wlowpass   min max filename") {
+      float min, max;
+      get_real(&min);
+      get_real(&max);
+      get_parameter(filename);
+      FloatImage *img = low->get_image_ptr();
+      img->write_pgm(filename, min, max);
+    } COMMAND ("lowpass  imgsize  filename") {
+      int isize;
+      get_integer(&isize);
+      get_parameter(filename);
+      make_lowpass_image(isize, filename);
+    } COMMAND ("postscript filename") {
+      get_parameter(filename);
+      ofstream file_out(filename);
+      write_postscript_start(&file_out);
+      bundle->write_postscript(&file_out);
+      write_postscript_end(&file_out);
+    } COMMAND ("draw_streamlines") {
+      win->clear();
+      win->makeicolor(BLACK, 0, 0, 0);
+      win->makeicolor(WHITE, 255, 255, 255);
+      win->set_color_index(WHITE);
+      bundle->draw(win);
+    } COMMAND ("thickness  line_width") {
+      float w;
+      get_real(&w);
+      set_line_thickness(w);
+    } COMMAND ("render_streamlines  radius") {
+      float rad;
+      get_real(&rad);
+      if (rad == 0.0) rad = 2.0;
+      FloatImage *tmp = bundle->filtered_render(xsize, ysize, rad);
+      win->gray_ramp();
+      tmp->draw_clamped(win, 0.0, 1.1);
+      delete tmp;
+    } COMMAND ("dashes  length separation arrow_length arrow_width") {
+      float length;
+      float separation;
+      float len, width;
+      get_real(&length);
+      get_real(&separation);
+      get_real(&len);
+      get_real(&width);
+      draw_dashes(win2, NULL, bundle, length, separation, len, width);
+    } COMMAND ("pdashes  length separation arrow_length arrow_width filename") {
+      float length;
+      float separation;
+      float len, width;
+      get_real(&length);
+      get_real(&separation);
+      get_real(&len);
+      get_real(&width);
+      get_parameter(filename);
+      draw_dashes(win2, filename, bundle, length, separation, len, width);
+    } COMMAND ("idashes  off/on (vary dash intensity?)") {
+      vary_arrow_intensity = get_boolean();
+    } COMMAND ("vorticity  grid_size") {
+      int size;
+      get_integer(&size);
+      if (size == 0)
+        size = 256;
+      FloatImage *image = vf->get_vorticity(size, size);
+      win2->gray_ramp();
+      image->draw(win2);
+    } COMMAND ("divergence  grid_size") {
+      int size;
+      get_integer(&size);
+      if (size == 0)
+        size = 256;
+      FloatImage *image = vf->get_divergence(size, size);
+      win2->gray_ramp();
+      image->draw(win2);
+    } COMMAND ("fload  filename") {
+      get_parameter(filename);
+      float_reg->read_file(filename);
+    } COMMAND ("fsave  filename") {
+      get_parameter(filename);
+      float_reg->write_file(filename);
+    } COMMAND ("floadpgm  filename") {
+      get_parameter(filename);
+      float_reg->read_pgm(filename);
+    } COMMAND ("fsavepgm  filename") {
+      get_parameter(filename);
+      float_reg->write_pgm(filename, 0.0, 1.1);
+    } COMMAND ("fdraw") {
+      float_reg->draw(win);
+    } COMMAND ("frender (radius)") {
+      float rad;
+      get_real(&rad);
+      if (rad == 0.0)
+        rad = 2.0;
+      if (float_reg != NULL)
+        delete float_reg;
+      float_reg = bundle->filtered_render(xsize, ysize, rad);
+      win->gray_ramp();
+      float_reg->draw_clamped(win, 0.0, 1.1);
+    } COMMAND ("fmap  min max") {
+      float min, max;
+      get_real(&min);
+      get_real(&max);
+      float_reg->remap(min, max);
+    } COMMAND ("fflip") {
+      for (i = 0; i < float_reg->getsize(); i++)
+        float_reg->pixel(i) = -1 * float_reg->pixel(i);
+    } COMMAND ("fbias  val") {
+      float val;
+      get_real(&val);
+      float_reg->bias(val);
+    } COMMAND ("fgain  val") {
+      float val;
+      get_real(&val);
+      float_reg->gain(val);
+    } COMMAND ("fseparation") {
+      if (float_reg)
+        vis_set_variable_separation(float_reg);
+    } COMMAND ("fwidth  min max") {
+
+      float min, max;
+      get_real(&min);
+      get_real(&max);
+
+      if (min == max || max == 0.0)
+        vis_set_draw_width(min);
+
+      if (float_reg)
+        vis_set_draw_width(float_reg, min, max);
+      else
+        fprintf(stderr, "No values in floating point register\n");
+    } COMMAND ("flength  min max") {
+
+      float min, max;
+      get_real(&min);
+      get_real(&max);
+
+      if (min == max || max == 0.0)
+        vis_set_arrow_length(min);
+
+      if (float_reg)
+        vis_set_arrow_length(float_reg, min, max);
+      else
+        fprintf(stderr, "No values in floating point register\n");
+    } COMMAND ("fmagnitude filename") {
+      get_parameter(filename);
+      VectorField *vtemp = new VectorField(filename);
+      float_reg = vtemp->get_magnitude();
+      delete vtemp;
+    } COMMAND ("fconstant") {
+      if (float_reg)
+        delete float_reg;
+      float_reg = new FloatImage(20, 20);
+      float_reg->setimage(1.0);
+    } COMMAND ("framp") {
+      int size = 20;
+      FloatImage *img = new FloatImage(size, size);
+      for (i = 0; i < size; i++)
+        for (j = 0; j < size; j++)
+          img->pixel(i, j) = i / (float) (size - 1);
+      if (float_reg)
+        delete float_reg;
+      float_reg = img->copy();
+    } COMMAND ("fnoise  size blur_steps") {
+      int size;
+      int steps;
+      get_integer(&size);
+      get_integer(&steps);
+
+      if (float_reg)
+        delete float_reg;
+      float_reg = new FloatImage(size, size);
+
+      for (i = 0; i < size; i++)
+        for (j = 0; j < size; j++)
+          float_reg->pixel(i, j) = drand48();
+
+      float_reg->blur(steps);
+    } COMMAND ("fcombine (vector-field and float_reg)") {
+      for (j = 0; j < vf->ysize; j++)
+        for (i = 0; i < vf->xsize; i++) {
+          float s = i / (float) vf->xsize;
+          float t = j / (float) vf->ysize;
+          float mag = float_reg->get_value(s, t);
+          vf->xval(i, j) = vf->xval(i, j) * mag;
+          vf->yval(i, j) = vf->yval(i, j) * mag;
+        }
+    } COMMAND ("fblur  steps") {
+      int steps;
+      get_integer(&steps);
+      float_reg->blur(steps);
+    } COMMAND ("fdipole") {
+      dipole_magnitude();
+    } COMMAND ("bdraw") {
+      win->clear();
+      win->makeicolor(BLACK, 0, 0, 0);
+      win->makeicolor(WHITE, 255, 255, 255);
+      win->set_color_index(WHITE);
+      bundle->draw(win);
+      bundle2->draw(win);
+    } COMMAND ("bcopy") {
+      bundle2 = bundle;
+    } COMMAND ("bclear") {
+      bundle = new Bundle();
+    } COMMAND ("intersect") {
+      win->makeicolor(BLACK, 0, 0, 0);
+      win->makeicolor(RED, 255, 0, 0);
+      win->makeicolor(WHITE, 255, 255, 255);
 
       /* the first few streamlines */
 #if 0
-    int nlines = 1;
+      int nlines = 1;
 
-    for (int k = 0; k < nlines; k++) {
-      Streamline *st = bundle->get_line(k);
-      win->set_color_index (RED);
-      st->draw(win);
+      for (int k = 0; k < nlines; k++) {
+        Streamline *st = bundle->get_line(k);
+        win->set_color_index (RED);
+        st->draw(win);
 
+        IntersectionChain *chain;
+        chain = new IntersectionChain();
+        chain->streamline_with_bundle (st, bundle2);
+
+        win->set_color_index (WHITE);
+        chain->draw(win);
+        delete chain;
+      }
+#endif
+
+      /* bundle with bundle */
+#if 1
       IntersectionChain *chain;
       chain = new IntersectionChain();
-      chain->streamline_with_bundle (st, bundle2);
+      chain->bundle_with_bundle(bundle, bundle2);
 
-      win->set_color_index (WHITE);
+      win->set_color_index(WHITE);
       chain->draw(win);
       delete chain;
-    }
 #endif
 
-     /* bundle with bundle */
-#if 1
-    IntersectionChain *chain;
-    chain = new IntersectionChain();
-    chain->bundle_with_bundle (bundle, bundle2);
-
-    win->set_color_index (WHITE);
-    chain->draw(win);
-    delete chain;
-#endif
-
-  }
-
-  COMMAND ("graph_quality  off/on") {
-    graph_the_quality = get_boolean();
-  }
-
-  COMMAND ("ltest num") {
-    int num;
-    get_integer (&num);
-    if (num == 0)
-      num = 4;
-    line_test (num);
-  }
-
-  COMMAND ("euler") {
-    set_integration (EULER);
-  }
-
-  COMMAND ("midpoint") {
-    set_integration (MIDPOINT);
-  }
-
-  COMMAND ("runge_kutta") {
-    set_integration (RUNGE_KUTTA);
-  }
-
-  COMMAND ("animation  off/on") {
-    animation_flag = get_boolean();
-  }
-
-  COMMAND ("graphics  off/on") {
-    graphics_flag = get_boolean();
-  }
-
-  COMMAND ("quit") {
-    printf ("Bye-bye.\n");
-    exit (0);
-  }
-
- END_CLI ("Pardon?", "Bye-bye.")
+    } COMMAND ("graph_quality  off/on") {
+      graph_the_quality = get_boolean();
+    } COMMAND ("ltest num") {
+      int num;
+      get_integer(&num);
+      if (num == 0)
+        num = 4;
+      line_test(num);
+    } COMMAND ("euler") {
+      set_integration(EULER);
+    } COMMAND ("midpoint") {
+      set_integration(MIDPOINT);
+    } COMMAND ("runge_kutta") {
+      set_integration(RUNGE_KUTTA);
+    } COMMAND ("animation  off/on") {
+      animation_flag = get_boolean();
+    } COMMAND ("graphics  off/on") {
+      graphics_flag = get_boolean();
+    } COMMAND ("quit") {
+      printf("Bye-bye.\n");
+      exit(0);
+    } END_CLI ("Pardon?", "Bye-bye.")
 }
 
 
@@ -3396,118 +3177,93 @@ Interpret commands.  These are the documented commands only.
 
 void new_interpreter()
 {
-  int i,j;
+  int i, j;
   char filename[80];
   int grid_num = 40;
   float grid_dist = 0.3;
 
-  START_CLI ("stplace","cli")
+  START_CLI ("stplace", "cli")
 
-  COMMAND ("vload file.vec") {
-    get_parameter (filename);
-    vf = new VectorField (filename);
-    float_reg = vf->get_magnitude();
-    vf->normalize();
-  }
+    COMMAND ("vload file.vec") {
+      get_parameter(filename);
+      vf = new VectorField(filename);
+      float_reg = vf->get_magnitude();
+      vf->normalize();
+    } COMMAND ("write_streamlines filename") {
+      get_parameter(filename);
+      if (taper_max > 0)
+        bundle->write_ascii(filename, 1);
+      else
+        bundle->write_ascii(filename, 0);
+    } COMMAND ("draw_streamlines") {
+      win->clear();
+      win->makeicolor(BLACK, 0, 0, 0);
+      win->makeicolor(WHITE, 255, 255, 255);
+      win->set_color_index(WHITE);
+      bundle->draw(win);
+    } COMMAND ("optimize  separation") {
+      float sep;
+      get_real(&sep);
+      optimize_streamlines(sep);
+    } COMMAND ("cascade  separation") {
+      float sep;
+      get_real(&sep);
+      cascaded_improve(sep);
+    } COMMAND ("tufts  separation  length") {
+      float sep, len;
+      get_real(&sep);
+      get_real(&len);
+      tufts(sep, len);
+    } COMMAND ("taper") {
+      taper_optimize();
+    } COMMAND ("squares  num_across  length") {
 
-  COMMAND ("write_streamlines filename") {
-    get_parameter (filename);
-    if (taper_max > 0)
-      bundle->write_ascii (filename, 1);
-    else
-      bundle->write_ascii (filename, 0);
-  }
+      int num;
+      get_integer(&num);
+      if (num != 0)
+        grid_num = num;
 
-  COMMAND ("draw_streamlines") {
-    win->clear();
-    win->makeicolor (BLACK, 0, 0, 0);
-    win->makeicolor (WHITE, 255, 255, 255);
-    win->set_color_index (WHITE);
-    bundle->draw(win);
-  }
+      float len;
+      get_real(&len);
+      if (len == 0) len = 0.1;
+      vis_set_birth_length(len);
 
-  COMMAND ("optimize  separation") {
-    float sep;
-    get_real (&sep);
-    optimize_streamlines(sep);
-  }
+      square_grid(grid_num);
+    } COMMAND ("hexagons  num_across  length") {
 
-  COMMAND ("cascade  separation") {
-    float sep;
-    get_real (&sep);
-    cascaded_improve(sep);
-  }
+      int num;
+      get_integer(&num);
+      if (num != 0)
+        grid_num = num;
 
-  COMMAND ("tufts  separation  length") {
-    float sep,len;
-    get_real (&sep);
-    get_real (&len);
-    tufts (sep, len);
-  }
+      float len;
+      get_real(&len);
+      if (len == 0) len = 0.1;
+      vis_set_birth_length(len);
 
-  COMMAND ("taper") {
-    taper_optimize();
-  }
-
-  COMMAND ("squares  num_across  length") {
-
-    int num;
-    get_integer (&num);
-    if (num != 0)
-      grid_num = num;
-
-    float len;
-    get_real (&len);
-    if (len == 0) len = 0.1;
-    vis_set_birth_length (len);
-
-    square_grid (grid_num);
-  }
-
-  COMMAND ("hexagons  num_across  length") {
-
-    int num;
-    get_integer (&num);
-    if (num != 0)
-      grid_num = num;
-
-    float len;
-    get_real (&len);
-    if (len == 0) len = 0.1;
-    vis_set_birth_length (len);
-
-    hexagonal_grid (grid_num);
-  }
-
-  COMMAND ("streamline xorg yorg len1 len2 (taper_tail taper_head)") {
-    float x,y,len1,len2;
-    float tail,head;
-    float delta = delta_step;
-    Streamline *st;
-    get_real (&x);
-    get_real (&y);
-    get_real (&len1);
-    get_real (&len2);
-    get_real (&tail);
-    get_real (&head);
-    if (tail != 0.0 || head != 0.0) {
-      set_taper (head, tail);
-      st = new Streamline(vf, x, y, len1, len2, delta);
-    }
-    else
-      st = new Streamline(vf, x, y, len1, len2, delta);
-    bundle->add_line (st);
-  }
-
-  COMMAND ("delta_step  value") {
-    get_real (&delta_step);
-  }
-
-  COMMAND ("quit") {
-    printf ("Bye-bye.\n");
-    exit (0);
-  }
-
-  END_CLI ("Pardon?", "Bye-bye.")
+      hexagonal_grid(grid_num);
+    } COMMAND ("streamline xorg yorg len1 len2 (taper_tail taper_head)") {
+      float x, y, len1, len2;
+      float tail, head;
+      float delta = delta_step;
+      Streamline *st;
+      get_real(&x);
+      get_real(&y);
+      get_real(&len1);
+      get_real(&len2);
+      get_real(&tail);
+      get_real(&head);
+      if (tail != 0.0 || head != 0.0) {
+        set_taper(head, tail);
+        st = new Streamline(vf, x, y, len1, len2, delta);
+      } else
+        st = new Streamline(vf, x, y, len1, len2, delta);
+      bundle->add_line(st);
+    } COMMAND ("delta_step  value") {
+      get_real(&delta_step);
+    } COMMAND ("quit") {
+      printf("Bye-bye.\n");
+      exit(0);
+    } END_CLI ("Pardon?", "Bye-bye.")
 }
 

@@ -28,26 +28,26 @@ warranty of merchantability or fitness for a particular purpose.
 #include "dissolve.h"
 
 static int randmasks[] = {
-  0x0,        //  0 (not used)
-  0x0,        //  1 (not used)
-  0x03,       //  2
-  0x06,       //  3
-  0x0c,       //  4
-  0x14,       //  5
-  0x30,       //  6
-  0x60,       //  7
-  0xb8,       //  8
-  0x0110,     //  9
-  0x0240,     // 10
-  0x0500,     // 11
-  0x0ca0,     // 12
-  0x1b00,     // 13
-  0x3500,     // 14
-  0x6000,     // 15
-  0xb400,     // 16
-  0x00012000, // 17
-  0x00020400, // 18
-  0x00072000, // 19
+        0x0,        //  0 (not used)
+        0x0,        //  1 (not used)
+        0x03,       //  2
+        0x06,       //  3
+        0x0c,       //  4
+        0x14,       //  5
+        0x30,       //  6
+        0x60,       //  7
+        0xb8,       //  8
+        0x0110,     //  9
+        0x0240,     // 10
+        0x0500,     // 11
+        0x0ca0,     // 12
+        0x1b00,     // 13
+        0x3500,     // 14
+        0x6000,     // 15
+        0xb400,     // 16
+        0x00012000, // 17
+        0x00020400, // 18
+        0x00072000, // 19
 };
 
 
@@ -79,8 +79,8 @@ Dissolve::Dissolve(int w, int h)
   initial_value = 1;
 
   int pixels = width * height;
-  int lastnum = pixels-1;
-  regwidth = bitwidth (lastnum);
+  int lastnum = pixels - 1;
+  regwidth = bitwidth(lastnum);
   if (regwidth < 2)
     regwidth = 2;
   mask = randmasks[regwidth];
@@ -144,7 +144,7 @@ void Dissolve::new_position(int &x, int &y)
 
 #if 1
 
-  int row,column;
+  int row, column;
 
   do {
     int value = next_value();

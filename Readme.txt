@@ -1,3 +1,16 @@
+Update 2020
+-----------
+
+This Project was updated to compile with iso c++ 2020 and is now a cmake project.
+
+Author: Aron Schaub
+
+Down below is the Readme by the Original Author:
+
+
+
+
+
                    Image-Guided Streamline Placement
 
                            Code Version 0.5

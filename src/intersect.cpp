@@ -85,22 +85,22 @@ Entry:
   st   - the first streamline
   st2  - the second streamline
 ******************************************************************************/
-void IntersectionChain::streamline_with_streamline(Streamline *st, 
-						   Streamline *st2)
+void IntersectionChain::streamline_with_streamline(Streamline *st,
+                                                   Streamline *st2)
 {
   int sample;    /* number of samples in a streamline */
   int i;
   float x1, y1, x2, y2;
 
   sample = st->get_samples();    /* there are always >= 1 samples */
-  for (i = 0; i < sample-1; i++) {
-      x1 = st->xs(i );
-      y1 = st->ys(i );
-      x2 = st->xs(i+1);
-      y2 = st->ys(i+1); 
+  for (i = 0; i < sample - 1; i++) {
+    x1 = st->xs(i);
+    y1 = st->ys(i);
+    x2 = st->xs(i + 1);
+    y2 = st->ys(i + 1);
 // printf ("sample %d %f %f %f %f\n", i, x1, y1, x2, y2);
-      segment_with_streamline( x1, y1, x2, y2, st, st2);
-      }
+    segment_with_streamline(x1, y1, x2, y2, st, st2);
+  }
 }
 
 
@@ -113,11 +113,11 @@ Entry:
   x2, y2  - the other endpoint of the segment 
   st, st2 - the streamlines
 ******************************************************************************/
-void IntersectionChain::segment_with_streamline(float x1, float y1, 
-					   float x2, float y2,
-					   Streamline *st, Streamline *st2)
+void IntersectionChain::segment_with_streamline(float x1, float y1,
+                                                float x2, float y2,
+                                                Streamline *st, Streamline *st2)
 {
-  int sample;	
+  int sample;
   int i, intersect_flag;
   float x3, y3, x4, y4;
   float x, y;
@@ -125,23 +125,23 @@ void IntersectionChain::segment_with_streamline(float x1, float y1,
 // printf ("one segment %f %f %f %f\n", x1, y1, x2, y2);
 
   sample = st->get_samples();    /* there are always >= 1 samples */
-  for (i = 0; i < sample-1; i++) {
-      x3 = st2->xs(i );
-      y3 = st2->ys(i );
-      x4 = st2->xs(i+1);
-      y4 = st2->ys(i+1); 
+  for (i = 0; i < sample - 1; i++) {
+    x3 = st2->xs(i);
+    y3 = st2->ys(i);
+    x4 = st2->xs(i + 1);
+    y4 = st2->ys(i + 1);
 // printf ("second segment: %f %f %f %f\n", x3, y3, x4, y4);
-      intersect_flag = segment_with_segment(
-			   x1, y1, x2, y2, 
-			   x3, y3, x4, y4, 
-			   &x, &y);
+    intersect_flag = segment_with_segment(
+            x1, y1, x2, y2,
+            x3, y3, x4, y4,
+            &x, &y);
 // printf ("intersect flag = %d\n", intersect_flag);
 // printf ("\n");
-      if (intersect_flag == DO_INTERSECT) {
+    if (intersect_flag == DO_INTERSECT) {
 // printf ("x y: %f %f\n", x, y);
-	add_point(x, y, st);
-	}
-      }
+      add_point(x, y, st);
+    }
+  }
 }
 
 
@@ -157,10 +157,10 @@ void IntersectionChain::add_point(float x, float y, Streamline *st)
   if (num_points >= max_points - 1) {
     Intersection *temp = new Intersection[max_points * 2];
     for (int i = 0; i < max_points; i++) {
-      temp[i].st     = points[i].st;
+      temp[i].st = points[i].st;
       temp[i].sample = points[i].sample;
-      temp[i].x      = points[i].x;
-      temp[i].y      = points[i].y;
+      temp[i].x = points[i].x;
+      temp[i].y = points[i].y;
       temp[i].arclen = points[i].arclen;
     }
     delete points;
@@ -193,13 +193,13 @@ void IntersectionChain::draw(Window2d *win)
   for (i = 0; i < num_points; i++) {
     x = points[i].x;
     y = points[i].y;
-    win->line (x-dx, y-dy, x+dx, y-dy);
-    win->line (x+dx, y-dy, x+dx, y+dy);
-    win->line (x+dx, y+dy, x-dx, y+dy);
-    win->line (x-dx, y+dy, x-dx, y-dy);
+    win->line(x - dx, y - dy, x + dx, y - dy);
+    win->line(x + dx, y - dy, x + dx, y + dy);
+    win->line(x + dx, y + dy, x - dx, y + dy);
+    win->line(x - dx, y + dy, x - dx, y - dy);
 
-    win->line (x-dx, y-dy, x+dx, y+dy);
-    win->line (x+dx, y-dy, x-dx, y+dy);
+    win->line(x - dx, y - dy, x + dx, y + dy);
+    win->line(x + dx, y - dy, x - dx, y + dy);
   }
 
   win->flush();
@@ -222,6 +222,6 @@ void IntersectionChain::from_streamline(Streamline *st)
     x = st->xs(i);
     y = st->ys(i);
     add_point(x, y, st);
-    }
+  }
 }
 

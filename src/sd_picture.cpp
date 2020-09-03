@@ -30,7 +30,6 @@ warranty of merchantability or fitness for a particular purpose.
 #include "sd_picture.h"
 
 
-
 /******************************************************************************
 Create a picture that will draw to a given window.
 
@@ -43,8 +42,8 @@ Picture::Picture(Window2d *w)
   win = w;
   type = PICT_WINDOW_TYPE;
 
-  int x,y;
-  w->getsize(&x,&y);
+  int x, y;
+  w->getsize(&x, &y);
   aspect_ratio = y / (float) x;
 }
 
@@ -62,8 +61,8 @@ Picture::Picture(float aspect, char *filename)
   type = PICT_POSTSCRIPT_TYPE;
   aspect_ratio = aspect;
 
-  file_out = new ofstream(filename);
-  write_postscript_start (file_out);
+  file_out = new std::ofstream(filename);
+  write_postscript_start(file_out);
 }
 
 
@@ -75,10 +74,9 @@ void Picture::set_intensity(float val)
 {
   if (type == PICT_WINDOW_TYPE) {
     int intensity = (int) (255 * val);
-    win->set_color_index (intensity);
-  }
-  else if (type == PICT_POSTSCRIPT_TYPE) {
-    *file_out << (1 - val) << " setgray" << endl;
+    win->set_color_index(intensity);
+  } else if (type == PICT_POSTSCRIPT_TYPE) {
+    *file_out << (1 - val) << " setgray" << std::endl;
   }
 }
 
@@ -93,20 +91,19 @@ Entry:
 ******************************************************************************/
 
 void Picture::thick_line(
-  float x1,
-  float y1,
-  float x2,
-  float y2,
-  float thickness
+        float x1,
+        float y1,
+        float x2,
+        float y2,
+        float thickness
 )
 {
   if (type == PICT_WINDOW_TYPE) {
     int t = (int) thickness;
-    win->thick_line (x1, y1, x2, y2, t);
-  }
-  else if (type == PICT_POSTSCRIPT_TYPE) {
-    *file_out << thickness << " sw" << endl;
-    *file_out << x1 << " " << y1 << " " << x2 << " " << y2 << " ln" << endl;
+    win->thick_line(x1, y1, x2, y2, t);
+  } else if (type == PICT_POSTSCRIPT_TYPE) {
+    *file_out << thickness << " sw" << std::endl;
+    *file_out << x1 << " " << y1 << " " << x2 << " " << y2 << " ln" << std::endl;
   }
 }
 
@@ -120,7 +117,7 @@ void Picture::polygon_start()
   if (type == PICT_WINDOW_TYPE)
     win->polygon_start();
   else if (type == PICT_POSTSCRIPT_TYPE) {
-    *file_out << "newpath " << endl;
+    *file_out << "newpath " << std::endl;
     first_vertex = 1;
   }
 }
@@ -133,14 +130,13 @@ Define a vertex of a polygon.
 void Picture::polygon_vertex(float x, float y)
 {
   if (type == PICT_WINDOW_TYPE)
-    win->polygon_vertex (x, y);
+    win->polygon_vertex(x, y);
   else if (type == PICT_POSTSCRIPT_TYPE) {
     if (first_vertex) {
-      *file_out << x << " " << y << " moveto" << endl;
+      *file_out << x << " " << y << " moveto" << std::endl;
       first_vertex = 0;
-    }
-    else
-      *file_out << x << " " << y << " lineto" << endl;
+    } else
+      *file_out << x << " " << y << " lineto" << std::endl;
   }
 }
 
@@ -154,7 +150,7 @@ void Picture::polygon_fill()
   if (type == PICT_WINDOW_TYPE)
     win->polygon_fill();
   else if (type == PICT_POSTSCRIPT_TYPE)
-    *file_out << " closepath fill" << endl;
+    *file_out << " closepath fill" << std::endl;
 }
 
 
@@ -186,36 +182,36 @@ void Picture::flush()
 Write the start of a postscript file.
 ******************************************************************************/
 
-void write_postscript_start(ofstream *file_out)
+void write_postscript_start(std::ofstream *file_out)
 {
   /* header comment */
 
-  *file_out << "%!" << endl;
-  *file_out << "%" << endl;
-  *file_out << "% Streamlines" << endl;
-  *file_out << "%" << endl;
+  *file_out << "%!" << std::endl;
+  *file_out << "%" << std::endl;
+  *file_out << "% Streamlines" << std::endl;
+  *file_out << "%" << std::endl;
 
   /* scale and translate picture properly */
 
-  *file_out << "/size 6 def" << endl;
-  *file_out << "72 72 3 mul translate" << endl;
-  *file_out << "72 size mul dup scale" << endl;
-  *file_out << endl;
+  *file_out << "/size 6 def" << std::endl;
+  *file_out << "72 72 3 mul translate" << std::endl;
+  *file_out << "72 size mul dup scale" << std::endl;
+  *file_out << std::endl;
 
   /* definition for line drawing */
 
-  *file_out << "/ln {" << endl;
-  *file_out << "newpath" << endl;
-  *file_out << "moveto lineto" << endl;
-  *file_out << "stroke" << endl;
-  *file_out << "} def" << endl;
-  *file_out << endl;
+  *file_out << "/ln {" << std::endl;
+  *file_out << "newpath" << std::endl;
+  *file_out << "moveto lineto" << std::endl;
+  *file_out << "stroke" << std::endl;
+  *file_out << "} def" << std::endl;
+  *file_out << std::endl;
 
   /* setting line widths */
 
-  *file_out << "1 72 div size div setlinewidth" << endl;
-  *file_out << "/init_width { 1 72 div size div setlinewidth } def" << endl;
-  *file_out << "/sw { 72 div size div setlinewidth } def" << endl;
+  *file_out << "1 72 div size div setlinewidth" << std::endl;
+  *file_out << "/init_width { 1 72 div size div setlinewidth } def" << std::endl;
+  *file_out << "/sw { 72 div size div setlinewidth } def" << std::endl;
 }
 
 
@@ -223,24 +219,24 @@ void write_postscript_start(ofstream *file_out)
 Write the end of a postscript file.
 ******************************************************************************/
 
-void write_postscript_end(ofstream *file_out, float aspect_ratio)
+void write_postscript_end(std::ofstream *file_out, float aspect_ratio)
 {
   /* border around image */
 
-  *file_out << endl;
-  *file_out << "0 setgray" << endl;
-  *file_out << "2 72 div size div setlinewidth" << endl;
-  *file_out << "0 0 moveto" << endl;
-  *file_out << "1 0 lineto" << endl;
-  *file_out << "1 " << aspect_ratio << " lineto" << endl;
-  *file_out << "0 " << aspect_ratio << " lineto" << endl;
-  *file_out << "closepath stroke" << endl;
-  *file_out << endl;
+  *file_out << std::endl;
+  *file_out << "0 setgray" << std::endl;
+  *file_out << "2 72 div size div setlinewidth" << std::endl;
+  *file_out << "0 0 moveto" << std::endl;
+  *file_out << "1 0 lineto" << std::endl;
+  *file_out << "1 " << aspect_ratio << " lineto" << std::endl;
+  *file_out << "0 " << aspect_ratio << " lineto" << std::endl;
+  *file_out << "closepath stroke" << std::endl;
+  *file_out << std::endl;
 
   /* show the page */
 
-  *file_out << endl;
-  *file_out << "showpage" << endl;
-  *file_out << endl;
+  *file_out << std::endl;
+  *file_out << "showpage" << std::endl;
+  *file_out << std::endl;
 }
 

@@ -33,8 +33,8 @@ warranty of merchantability or fitness for a particular purpose.
 #include "lowpass.h"
 #include "visparams.h"
 
-#define Min(a,b) ((a) > (b) ? (b) : (a))
-#define Max(a,b) ((a) > (b) ? (a) : (b))
+#define Min(a, b) ((a) > (b) ? (b) : (a))
+#define Max(a, b) ((a) > (b) ? (a) : (b))
 #define Square(a) ((a)*(a))
 
 
@@ -51,17 +51,17 @@ Lowpass::Lowpass(int x, int y, float rad, float targ)
 {
   xsize = x;
   ysize = y;
-  image = new FloatImage (x, y);
+  image = new FloatImage(x, y);
   image->setimage(0.0);
   target = targ;
   sum = xsize * ysize * target * target;
 
-  rad_image = new FloatImage (x, y);
+  rad_image = new FloatImage(x, y);
   for (int i = 0; i < x; i++)
     for (int j = 0; j < y; j++) {
       float xx = i / (float) x;
       float yy = j / (float) x;
-      rad_image->pixel(i,j) = vis_get_blur_radius(xx,yy);
+      rad_image->pixel(i, j) = vis_get_blur_radius(xx, yy);
     }
 
   bundle = new Bundle();
@@ -80,20 +80,20 @@ Exit:
 ******************************************************************************/
 
 void compute_line(
-  float x1,
-  float y1,
-  float x2,
-  float y2,
-  float &a,
-  float &b,
-  float &c
+        float x1,
+        float y1,
+        float x2,
+        float y2,
+        float &a,
+        float &b,
+        float &c
 )
 {
   a = y2 - y1;
   b = x1 - x2;
   c = y1 * x2 - x1 * y2;
 
-  float len = sqrt (a*a + b*b);
+  float len = sqrt(a * a + b * b);
 
   if (len > 0) {
     a /= len;
@@ -109,9 +109,9 @@ Create the radially-symmetric filter for quick table lookup.
 
 void create_radial_filter()
 {
-  int i,j;
+  int i, j;
 
-  float delta = 1.0 / (samples-1);
+  float delta = 1.0 / (samples - 1);
 
   for (i = 0; i < samples; i++)
     for (j = 0; j < samples; j++)
@@ -122,7 +122,7 @@ void create_radial_filter()
     float sum = 0;
     for (j = 0; j < samples; j++) {
       float h = j * delta;
-      float t = sqrt (r*r + h*h);
+      float t = sqrt(r * r + h * h);
       float f = (2 * t - 3) * t * t + 1;
       if (t > 1)
         f = 0;
@@ -156,8 +156,8 @@ float radial_value(float x, float y)
   x = fabs(x);
   y = fabs(y);
 
-  int i = (int) floor((samples-1) * x);
-  int j = (int) floor((samples-1) * y);
+  int i = (int) floor((samples - 1) * x);
+  int j = (int) floor((samples - 1) * y);
 
   if (i == samples - 1)
     i = samples - 2;
@@ -165,13 +165,13 @@ float radial_value(float x, float y)
   if (j == samples - 1)
     j = samples - 2;
 
-  float tx = (samples-1) * x - i;
-  float ty = (samples-1) * y - j;
- 
+  float tx = (samples - 1) * x - i;
+  float ty = (samples - 1) * y - j;
+
   float s00 = filter_sum[i][j];
-  float s01 = filter_sum[i][j+1];
-  float s10 = filter_sum[i+1][j];
-  float s11 = filter_sum[i+1][j+1];
+  float s01 = filter_sum[i][j + 1];
+  float s10 = filter_sum[i + 1][j];
+  float s11 = filter_sum[i + 1][j + 1];
 
   float s0 = s00 + ty * (s01 - s00);
   float s1 = s10 + ty * (s11 - s10);
@@ -196,15 +196,15 @@ Exit:
   returns contribution to the pixel
 ******************************************************************************/
 float Lowpass::better_filter_segment(
-  int i,
-  int j,
-  float x0,
-  float y0,
-  float x1,
-  float y1,
-  float a,
-  float b,
-  float c
+        int i,
+        int j,
+        float x0,
+        float y0,
+        float x1,
+        float y1,
+        float a,
+        float b,
+        float c
 )
 {
 #if 0
@@ -228,9 +228,9 @@ float Lowpass::better_filter_segment(
   float xx1 = x1;
   float yy1 = y1;
 
-  x0 =  a * xx0 + b * yy0;
+  x0 = a * xx0 + b * yy0;
   y0 = -b * xx0 + a * yy0;
-  x1 =  a * xx1 + b * yy1;
+  x1 = a * xx1 + b * yy1;
   y1 = -b * xx1 + a * yy1;
 
   /* maybe flip the line across the y-axis */
@@ -242,7 +242,7 @@ float Lowpass::better_filter_segment(
 
   /* scale segment by the radius of the filter */
 
-  float recip = 1.0 / rad_image->pixel(i,j);
+  float recip = 1.0 / rad_image->pixel(i, j);
   x0 *= recip;
   y0 *= recip;
   x1 *= recip;
@@ -258,9 +258,9 @@ float Lowpass::better_filter_segment(
     return (0.0);
 
   if (y0 < -1.0) y0 = -1.0;
-  if (y0 >  1.0) y0 =  1.0;
+  if (y0 > 1.0) y0 = 1.0;
   if (y1 < -1.0) y1 = -1.0;
-  if (y1 >  1.0) y1 =  1.0;
+  if (y1 > 1.0) y1 = 1.0;
 
 #if 0
   printf ("clipped x0 y0 x1 y1: %f %f %f %f\n", x0, y0, x1, y1);
@@ -269,11 +269,10 @@ float Lowpass::better_filter_segment(
   /* determine filter contribution */
 
   if (y0 * y1 > 0) {  /* same side of x-axis */
-    float diff = radial_value (x0, y0) - radial_value (x1, y1);
-    return (fabs (diff));
-  }
-  else {              /* opposite sides of x-axis */
-    float sum = radial_value (x0, y0) + radial_value (x1, y1);
+    float diff = radial_value(x0, y0) - radial_value(x1, y1);
+    return (fabs(diff));
+  } else {              /* opposite sides of x-axis */
+    float sum = radial_value(x0, y0) + radial_value(x1, y1);
     return (sum);
   }
 }
@@ -292,7 +291,7 @@ Exit:
 
 float Lowpass::new_quality(Streamline *st)
 {
-  float a,b,c;
+  float a, b, c;
 
   if (!filter_made) {
     create_radial_filter();
@@ -316,9 +315,9 @@ float Lowpass::new_quality(Streamline *st)
 
     float x0 = st->xs(n);
     float y0 = st->ys(n);
-    float x1 = st->xs(n+1);
-    float y1 = st->ys(n+1);
-    float taper_scale = 0.5 * (st->pts[n].intensity + st->pts[n+1].intensity);
+    float x1 = st->xs(n + 1);
+    float y1 = st->ys(n + 1);
+    float taper_scale = 0.5 * (st->pts[n].intensity + st->pts[n + 1].intensity);
 
     float rad = rad_image->get_value((x0 + x1) * 0.5, (y0 + y1) * 0.5);
 
@@ -329,35 +328,35 @@ float Lowpass::new_quality(Streamline *st)
 
     /* find which pixels the segment can affect */
 
-    int i0 = (int) Min (floor (x0 - rad), floor (x1 - rad));
-    int i1 = (int) Max (ceil  (x0 + rad), ceil  (x1 + rad));
-    int j0 = (int) Min (floor (y0 - rad), floor (y1 - rad));
-    int j1 = (int) Max (ceil  (y0 + rad), ceil  (y1 + rad));
+    int i0 = (int) Min (floor(x0 - rad), floor(x1 - rad));
+    int i1 = (int) Max (ceil(x0 + rad), ceil(x1 + rad));
+    int j0 = (int) Min (floor(y0 - rad), floor(y1 - rad));
+    int j1 = (int) Max (ceil(y0 + rad), ceil(y1 + rad));
 
     /* clamp these values to the image size */
     i0 = Max (i0, 0);
     j0 = Max (j0, 0);
-    i1 = Min (i1, xsize-1);
-    j1 = Min (j1, ysize-1);
+    i1 = Min (i1, xsize - 1);
+    j1 = Min (j1, ysize - 1);
 
 #if 0
-printf ("x0 y0 x1 y1: %f %f %f %f\n", x0, y0, x1, y1);
-printf ("i0 j0 i1 j1: %d %d %d %d\n", i0, j0, i1, j1);
-printf ("\n");
+    printf ("x0 y0 x1 y1: %f %f %f %f\n", x0, y0, x1, y1);
+    printf ("i0 j0 i1 j1: %d %d %d %d\n", i0, j0, i1, j1);
+    printf ("\n");
 #endif
 
     /* compute equation for line through the segment */
 
-    compute_line (x0, y0, x1, y1, a, b, c);
+    compute_line(x0, y0, x1, y1, a, b, c);
 
     /* loop over the possibly affected pixels */
 
     for (int i = i0; i <= i1; i++) {
       for (int j = j0; j <= j1; j++) {
-        float value = better_filter_segment (i, j, x0, y0, x1, y1, a, b, c);
+        float value = better_filter_segment(i, j, x0, y0, x1, y1, a, b, c);
         value *= taper_scale;
 #if 0
-printf ("i j value: %d %d %f\n", i, j, value);
+        printf ("i j value: %d %d %f\n", i, j, value);
 #endif
         if (value > 0)
           st->add_value(i, j, value);
@@ -370,24 +369,24 @@ printf ("i j value: %d %d %f\n", i, j, value);
   float new_sum = sum;
 
   for (int n = 0; n < st->num_values; n++) {
-    int i,j;
+    int i, j;
     float value;
-    st->get_value (n, i, j, value);
-    new_sum -= Square (target - image->pixel(i,j));
-    image->pixel(i,j) += value;
-    new_sum += Square (target - image->pixel(i,j));
+    st->get_value(n, i, j, value);
+    new_sum -= Square (target - image->pixel(i, j));
+    image->pixel(i, j) += value;
+    new_sum += Square (target - image->pixel(i, j));
   }
 
   /* take out what we added in */
   for (int n = 0; n < st->num_values; n++) {
-    int i,j;
+    int i, j;
     float value;
-    st->get_value (n, i, j, value);
-    image->pixel(i,j) -= value;
+    st->get_value(n, i, j, value);
+    image->pixel(i, j) -= value;
   }
 
 #if 0
-printf ("sum new_sum: %f %f\n", sum, new_sum);
+  printf ("sum new_sum: %f %f\n", sum, new_sum);
 #endif
 
   return (new_sum);
@@ -404,11 +403,11 @@ Entry:
 ******************************************************************************/
 
 void Lowpass::filter_segment(
-  float x0,
-  float y0,
-  float x1,
-  float y1,
-  float scale
+        float x0,
+        float y0,
+        float x1,
+        float y1,
+        float scale
 )
 {
   /* create the radial filter if it hasn't already been made */
@@ -426,28 +425,28 @@ void Lowpass::filter_segment(
 
   /* find which pixels the segment can affect */
 
-  int i0 = (int) Min (floor (x0 - rad), floor (x1 - rad));
-  int i1 = (int) Max (ceil  (x0 + rad), ceil  (x1 + rad));
-  int j0 = (int) Min (floor (y0 - rad), floor (y1 - rad));
-  int j1 = (int) Max (ceil  (y0 + rad), ceil  (y1 + rad));
+  int i0 = (int) Min (floor(x0 - rad), floor(x1 - rad));
+  int i1 = (int) Max (ceil(x0 + rad), ceil(x1 + rad));
+  int j0 = (int) Min (floor(y0 - rad), floor(y1 - rad));
+  int j1 = (int) Max (ceil(y0 + rad), ceil(y1 + rad));
 
   /* clamp these values to the image size */
   i0 = Max (i0, 0);
   j0 = Max (j0, 0);
-  i1 = Min (i1, xsize-1);
-  j1 = Min (j1, ysize-1);
+  i1 = Min (i1, xsize - 1);
+  j1 = Min (j1, ysize - 1);
 
   /* compute equation for line through the segment */
-  float a,b,c;
-  compute_line (x0, y0, x1, y1, a, b, c);
+  float a, b, c;
+  compute_line(x0, y0, x1, y1, a, b, c);
 
   /* loop over the possibly affected pixels, adding the segment's */
   /* contribution to the image */
 
   for (int i = i0; i <= i1; i++)
     for (int j = j0; j <= j1; j++) {
-      float value = better_filter_segment (i, j, x0, y0, x1, y1, a, b, c);
-      image->pixel(i,j) += value * scale;
+      float value = better_filter_segment(i, j, x0, y0, x1, y1, a, b, c);
+      image->pixel(i, j) += value * scale;
     }
 }
 
@@ -458,16 +457,16 @@ Add a streamline to an image.
 
 void Lowpass::add_line(Streamline *st)
 {
-  int i,j;
+  int i, j;
   float value;
 
   /* add these values to the image */
 
   for (int n = 0; n < st->num_values; n++) {
-    st->get_value (n, i, j, value);
-    sum -= Square (target - image->pixel(i,j));
-    image->pixel(i,j) += value;
-    sum += Square (target - image->pixel(i,j));
+    st->get_value(n, i, j, value);
+    sum -= Square (target - image->pixel(i, j));
+    image->pixel(i, j) += value;
+    sum += Square (target - image->pixel(i, j));
   }
 
   /* add new streamline to bundle */
@@ -481,16 +480,16 @@ Remove a streamline from an image.
 
 void Lowpass::delete_line(Streamline *st)
 {
-  int i,j;
+  int i, j;
   float value;
 
   /* subtract these values from the image */
 
   for (int n = 0; n < st->num_values; n++) {
-    st->get_value (n, i, j, value);
-    sum -= Square (target - image->pixel(i,j));
-    image->pixel(i,j) -= value;
-    sum += Square (target - image->pixel(i,j));
+    st->get_value(n, i, j, value);
+    sum -= Square (target - image->pixel(i, j));
+    image->pixel(i, j) -= value;
+    sum += Square (target - image->pixel(i, j));
   }
 
   /* remove streamline from bundle */
@@ -515,19 +514,19 @@ Calculate the image quality from scratch.
 
 float Lowpass::recalculate_quality()
 {
-  int i,j;
+  int i, j;
   float tsum = 0;
 
   /* re-create image */
 
-  image->setimage (0.0);
+  image->setimage(0.0);
 
   for (int num = 0; num < bundle->num_lines; num++) {
     Streamline *st = bundle->get_line(num);
     for (int n = 0; n < st->num_values; n++) {
       float value;
-      st->get_value (n, i, j, value);
-      image->pixel(i,j) += value;
+      st->get_value(n, i, j, value);
+      image->pixel(i, j) += value;
     }
   }
 
@@ -535,10 +534,10 @@ float Lowpass::recalculate_quality()
 
   for (i = 0; i < xsize; i++)
     for (j = 0; j < ysize; j++)
-      tsum += Square (target - image->pixel(i,j));
+      tsum += Square (target - image->pixel(i, j));
 
   sum = tsum;
-  
+
   return (tsum);
 }
 
@@ -554,9 +553,9 @@ Exit:
   whether we're below the threshold
 ******************************************************************************/
 
-int Lowpass::birth_test (float x, float y, float birth_thresh)
+int Lowpass::birth_test(float x, float y, float birth_thresh)
 {
-  return (image->get_value(x,y) < birth_thresh);
+  return (image->get_value(x, y) < birth_thresh);
 }
 
 
@@ -587,7 +586,7 @@ void Lowpass::set_radius(float r1, float r2)
     float t = i / (float) (xsize - 1);
     float r = r1 + t * (r2 - r1);
     for (int j = 0; j < ysize; j++) {
-      rad_image->pixel(i,j) = r;
+      rad_image->pixel(i, j) = r;
     }
   }
 }
@@ -608,17 +607,17 @@ Exit:
 ******************************************************************************/
 
 float Lowpass::random_samples_quality(
-  Streamline *st,
-  float radius,
-  int nsamples,
-  float dist,
-  Window2d *win
+        Streamline *st,
+        float radius,
+        int nsamples,
+        float dist,
+        Window2d *win
 )
 {
   int i;
   int num;
   int index;
-  float x,y;
+  float x, y;
   float rad;
 
   float sum = 0;
@@ -656,14 +655,12 @@ float Lowpass::random_samples_quality(
       float pick = drand48();
 
       if (pick < 0.3333) {
-        index = (int) floor (drand48() * st->samples);
+        index = (int) floor(drand48() * st->samples);
         rad = radius;
-      }
-      else if (pick < 0.6666) {
+      } else if (pick < 0.6666) {
         index = 0;
         rad = 2 * radius;
-      }
-      else {
+      } else {
         index = st->samples - 1;
         rad = 2 * radius;
       }
@@ -677,11 +674,11 @@ float Lowpass::random_samples_quality(
     /* debug drawing of samples */
 
     if (win) {
-      win->set_color_index (255);
-      win->line (x, y, x, y);
+      win->set_color_index(255);
+      win->line(x, y, x, y);
     }
 
-    sum += Square (target - image->get_value(x,y));
+    sum += Square (target - image->get_value(x, y));
   }
 
 #if 0
@@ -736,18 +733,18 @@ Exit:
 ******************************************************************************/
 
 float Lowpass::shorten_quality(
-  Streamline *st,
-  float radius,
-  int nsamples,
-  float dist,
-  Window2d *win,
-  int &which_end
+        Streamline *st,
+        float radius,
+        int nsamples,
+        float dist,
+        Window2d *win,
+        int &which_end
 )
 {
   int i;
   float rad;
   float delta;
-  float x,y;
+  float x, y;
   float sum1 = 0;
   float sum2 = 0;
   int count1 = 0;
@@ -766,7 +763,7 @@ float Lowpass::shorten_quality(
 
   x = st->pts[0].x;
   y = st->pts[0].y;
-  rad = radius * rad_image->get_value(x,y) / xsize;
+  rad = radius * rad_image->get_value(x, y) / xsize;
   delta = dist * rad / nsamples;
 
   for (i = 0; i < nsamples; i++) {
@@ -776,27 +773,27 @@ float Lowpass::shorten_quality(
       continue;
 
     /* measure the point's quality */
-    float value =  image->get_value(x,y);
+    float value = image->get_value(x, y);
     if (value > target)
       sum1 += Square (target - value);
     count1++;
 
     /* debug drawing of samples */
     if (win) {
-      win->set_color_index (255);
-      win->line (x, y, x, y);
+      win->set_color_index(255);
+      win->line(x, y, x, y);
     }
 
     /* move further away from the endpoint */
-    x += delta * vf->xval(x,y);
-    y += delta * vf->yval(x,y);
+    x += delta * vf->xval(x, y);
+    y += delta * vf->yval(x, y);
   }
 
   /* now measure from the head */
 
   x = st->pts[st->samples - 1].x;
   y = st->pts[st->samples - 1].y;
-  rad = radius * rad_image->get_value(x,y) / xsize;
+  rad = radius * rad_image->get_value(x, y) / xsize;
   delta = dist * rad / nsamples;
 
   for (i = 0; i < nsamples; i++) {
@@ -806,20 +803,20 @@ float Lowpass::shorten_quality(
       continue;
 
     /* measure the point's quality */
-    float value =  image->get_value(x,y);
+    float value = image->get_value(x, y);
     if (value > target)
       sum2 += Square (target - value);
     count2++;
 
     /* debug drawing of samples */
     if (win) {
-      win->set_color_index (255);
-      win->line (x, y, x, y);
+      win->set_color_index(255);
+      win->line(x, y, x, y);
     }
 
     /* move further away from the endpoint */
-    x -= delta * vf->xval(x,y);
-    y -= delta * vf->yval(x,y);
+    x -= delta * vf->xval(x, y);
+    y -= delta * vf->yval(x, y);
   }
 
   /* determine quality */
@@ -861,18 +858,18 @@ Exit:
 ******************************************************************************/
 
 float Lowpass::lengthen_quality(
-  Streamline *st,
-  float radius,
-  int nsamples,
-  float dist,
-  Window2d *win,
-  int &which_end
+        Streamline *st,
+        float radius,
+        int nsamples,
+        float dist,
+        Window2d *win,
+        int &which_end
 )
 {
   int i;
   float rad;
   float delta;
-  float x,y;
+  float x, y;
   float sum1 = 0;
   float sum2 = 0;
   int count1 = 0;
@@ -890,7 +887,7 @@ float Lowpass::lengthen_quality(
 
   x = st->pts[0].x;
   y = st->pts[0].y;
-  rad = radius * rad_image->get_value(x,y) / xsize;
+  rad = radius * rad_image->get_value(x, y) / xsize;
   delta = dist * rad / nsamples;
 
   for (i = 0; i < nsamples; i++) {
@@ -900,27 +897,27 @@ float Lowpass::lengthen_quality(
       break;
 
     /* measure the point's quality */
-    float value =  image->get_value(x,y);
+    float value = image->get_value(x, y);
     if (value < target)
       sum1 += Square (target - value);
     count1++;
 
     /* debug drawing of samples */
     if (win) {
-      win->set_color_index (255);
-      win->line (x, y, x, y);
+      win->set_color_index(255);
+      win->line(x, y, x, y);
     }
 
     /* move further away from the endpoint */
-    x -= delta * vf->xval(x,y);
-    y -= delta * vf->yval(x,y);
+    x -= delta * vf->xval(x, y);
+    y -= delta * vf->yval(x, y);
   }
 
   /* now measure from the head */
 
   x = st->pts[st->samples - 1].x;
   y = st->pts[st->samples - 1].y;
-  rad = radius * rad_image->get_value(x,y) / xsize;
+  rad = radius * rad_image->get_value(x, y) / xsize;
   delta = dist * rad / nsamples;
 
   for (i = 0; i < nsamples; i++) {
@@ -930,20 +927,20 @@ float Lowpass::lengthen_quality(
       break;
 
     /* measure the point's quality */
-    float value =  image->get_value(x,y);
+    float value = image->get_value(x, y);
     if (value < target)
       sum2 += Square (target - value);
     count2++;
 
     /* debug drawing of samples */
     if (win) {
-      win->set_color_index (255);
-      win->line (x, y, x, y);
+      win->set_color_index(255);
+      win->line(x, y, x, y);
     }
 
     /* move further away from the endpoint */
-    x += delta * vf->xval(x,y);
-    y += delta * vf->yval(x,y);
+    x += delta * vf->xval(x, y);
+    y += delta * vf->yval(x, y);
   }
 
   /* determine quality */
@@ -986,18 +983,18 @@ Exit:
 ******************************************************************************/
 
 float Lowpass::main_body_quality(
-  Streamline *st,
-  float radius,
-  int nsamples,
-  float dist,
-  Window2d *win,
-  int &which_side
+        Streamline *st,
+        float radius,
+        int nsamples,
+        float dist,
+        Window2d *win,
+        int &which_side
 )
 {
   int i;
   float rad;
   float delta;
-  float x,y;
+  float x, y;
   float sum = 0;
   int count = 0;
   VectorField *vf = st->vf;
@@ -1023,12 +1020,12 @@ float Lowpass::main_body_quality(
     if (x < xmin || x > xmax || y < ymin || y > ymax)
       continue;
 
-    rad = radius * rad_image->get_value(x,y) / xsize;
+    rad = radius * rad_image->get_value(x, y) / xsize;
     delta = 0.3 * rad / nsamples;
 
     /* find out how to move perpendicular to the vector field */
-    float dx = - delta * vf->yval(x,y);
-    float dy =   delta * vf->xval(x,y);
+    float dx = -delta * vf->yval(x, y);
+    float dy = delta * vf->xval(x, y);
 
     /* sample along either side of the streamline */
     float x1 = x + dx;
@@ -1037,8 +1034,8 @@ float Lowpass::main_body_quality(
     float y2 = y - dy;
 
     /* measure the quality at the two points */
-    float value1 = image->get_value(x1,y1);
-    float value2 = image->get_value(x2,y2);
+    float value1 = image->get_value(x1, y1);
+    float value2 = image->get_value(x2, y2);
 #if 0
     float diff = value1 - value2;
     sum += copysign (Square(diff), diff);
@@ -1050,9 +1047,9 @@ float Lowpass::main_body_quality(
 
     /* debug drawing of samples */
     if (win) {
-      win->set_color_index (255);
-      win->line (x1, y1, x1, y1);
-      win->line (x2, y2, x2, y2);
+      win->set_color_index(255);
+      win->line(x1, y1, x1, y1);
+      win->line(x2, y2, x2, y2);
     }
   }
 
@@ -1067,7 +1064,7 @@ float Lowpass::main_body_quality(
     else
       which_side = RIGHT;
 
-    return (fabs (sum / count));
+    return (fabs(sum / count));
   }
 }
 
@@ -1087,11 +1084,11 @@ Exit:
 ******************************************************************************/
 
 void Lowpass::streamline_quality(
-  Streamline *st,
-  float radius,
-  int nsamples,
-  float dist,
-  Window2d *win
+        Streamline *st,
+        float radius,
+        int nsamples,
+        float dist,
+        Window2d *win
 )
 {
 
@@ -1104,21 +1101,20 @@ void Lowpass::streamline_quality(
   int lengthen_end;
   int shorten_end;
   int move_side;
-  float lq,sq,mq;
+  float lq, sq, mq;
 
-  float x,y;
-  st->get_origin(x,y);
-  int length_frozen = (vis_get_delta_length(x,y) == 0);
+  float x, y;
+  st->get_origin(x, y);
+  int length_frozen = (vis_get_delta_length(x, y) == 0);
 
   if (length_frozen) {
     lq = sq = 0;
-  }
-  else {
-    lq = lengthen_quality (st, radius, nsamples, dist, win, lengthen_end);
-    sq = shorten_quality (st, radius, nsamples, dist, win, shorten_end);
+  } else {
+    lq = lengthen_quality(st, radius, nsamples, dist, win, lengthen_end);
+    sq = shorten_quality(st, radius, nsamples, dist, win, shorten_end);
   }
 
-  mq = main_body_quality (st, radius, nsamples, dist, win, move_side);
+  mq = main_body_quality(st, radius, nsamples, dist, win, move_side);
   mq *= 4;
 
   st->quality = lq + sq + mq;
@@ -1135,8 +1131,7 @@ void Lowpass::streamline_quality(
       change |= HEAD_CHANGE;
     else if (lengthen_end == TAIL)
       change |= TAIL_CHANGE;
-    }
-  else if (sq > lq && sq > mq && !length_frozen) {  /* shorten */
+  } else if (sq > lq && sq > mq && !length_frozen) {  /* shorten */
     change |= LEN_CHANGE;
     change |= SHORT_ONE;
 
@@ -1144,8 +1139,7 @@ void Lowpass::streamline_quality(
       change |= HEAD_CHANGE;
     else if (shorten_end == TAIL)
       change |= TAIL_CHANGE;
-  }
-  else {                          /* move */
+  } else {                          /* move */
     change |= MOVE_CHANGE;
 
 #if 0
@@ -1187,20 +1181,17 @@ unsigned long int Lowpass::recommend_change(Streamline *st)
 
   if (verbose_flag)
     if ((change & MOVE_CHANGE) && (change & LEN_CHANGE)) {
-      printf ("R");
-      fflush (stdout);
-    }
-    else if (change & LONG_ONE) {
-      printf ("L");
-      fflush (stdout);
-    }
-    else if (change & SHORT_ONE) {
-      printf ("S");
-      fflush (stdout);
-    }
-    else if (change & MOVE_CHANGE) {
-      printf ("M");
-      fflush (stdout);
+      printf("R");
+      fflush(stdout);
+    } else if (change & LONG_ONE) {
+      printf("L");
+      fflush(stdout);
+    } else if (change & SHORT_ONE) {
+      printf("S");
+      fflush(stdout);
+    } else if (change & MOVE_CHANGE) {
+      printf("M");
+      fflush(stdout);
     }
 
   return (change);

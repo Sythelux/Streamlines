@@ -21,47 +21,76 @@ warranty of merchantability or fitness for a particular purpose.
 
 #include "../libs/floatimage.h"
 
-class VectorField {
-  float *values;
-  float aspect;
-  float aspect_recip;
+class VectorField
+{
+    float *values;
+    float aspect;
+    float aspect_recip;
 public:
-  int xsize,ysize;
-  VectorField(int w, int h) {
-    xsize = w;
-    ysize = h;
-    aspect = h / (float) w;
-    aspect_recip = 1.0 / aspect;
-    values = new float [xsize * ysize * 2];
-  }
-  VectorField(char *filename);
-  ~VectorField() {
-    delete values;
-  }
-  float xval(float x, float y);
-  float yval(float x, float y);
-  float xyval(float, float, int, float&, float&);
-  float& xval(int x, int y) {
-    return (values[2 * (y * xsize + x)]);
-  }
-  float& xval(int index) {
-    return (values[2 * index]);
-  }
-  float& yval(int x, int y) {
-    return (values[2 * (y * xsize + x) + 1]);
-  }
-  float& yval(int index) {
-    return (values[2 * index + 1]);
-  }
-  float integrate(float,float,float,int,float&,float&);
-  int getwidth() { return (xsize); }
-  int getheight() { return (ysize); }
-  float getaspect() { return (aspect); }
-  FloatImage *get_magnitude();
-  FloatImage *get_vorticity(int,int);
-  FloatImage *get_divergence(int,int);
-  void normalize();
-  void write_file (char *);
+    int xsize, ysize;
+
+    VectorField(int w, int h)
+    {
+      xsize = w;
+      ysize = h;
+      aspect = h / (float) w;
+      aspect_recip = 1.0 / aspect;
+      values = new float[xsize * ysize * 2];
+    }
+
+    VectorField(char *filename);
+
+    ~VectorField()
+    {
+      delete values;
+    }
+
+    float xval(float x, float y);
+
+    float yval(float x, float y);
+
+    float xyval(float, float, int, float &, float &);
+
+    float &xval(int x, int y)
+    {
+      return (values[2 * (y * xsize + x)]);
+    }
+
+    float &xval(int index)
+    {
+      return (values[2 * index]);
+    }
+
+    float &yval(int x, int y)
+    {
+      return (values[2 * (y * xsize + x) + 1]);
+    }
+
+    float &yval(int index)
+    {
+      return (values[2 * index + 1]);
+    }
+
+    float integrate(float, float, float, int, float &, float &);
+
+    int getwidth()
+    { return (xsize); }
+
+    int getheight()
+    { return (ysize); }
+
+    float getaspect()
+    { return (aspect); }
+
+    FloatImage *get_magnitude();
+
+    FloatImage *get_vorticity(int, int);
+
+    FloatImage *get_divergence(int, int);
+
+    void normalize();
+
+    void write_file(char *);
 };
 
 void set_integration(int);  /* set which type of integrator to use */

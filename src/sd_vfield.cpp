@@ -26,6 +26,7 @@ warranty of merchantability or fitness for a particular purpose.
 #include <math.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <cstring>
 #include "window.h"
 #include "floatimage.h"
 #include "sd_vfield.h"
@@ -48,23 +49,23 @@ VectorField::VectorField(char *filename)
   /* append ".vec" to the file name if necesary */
 
   char name[80];
-  strcpy (name, filename);
-  if (strlen (name) < 4 || strcmp (name + strlen (name) - 4, ".vec") != 0)
-    strcat (name, ".vec");
+  strcpy(name, filename);
+  if (strlen(name) < 4 || strcmp(name + strlen(name) - 4, ".vec") != 0)
+    strcat(name, ".vec");
 
-  ifstream infile(name, ios::in);
+  std::ifstream infile(name, std::ios::in);
 
   if (!infile) {
-    fprintf (stderr, "Error openning '%s'\n", name);
-    exit (-1);
+    fprintf(stderr, "Error openning '%s'\n", name);
+    exit(-1);
   }
 
-  printf ("reading %s\n", filename);
+  printf("reading %s\n", filename);
 
   char *str = new char[80];
 
   while (!done) {
-    infile.get (str[index]);
+    infile.get(str[index]);
     if (str[index] == '\n')
       linefeeds++;
     if (linefeeds == 3 || index >= 100)
@@ -74,18 +75,18 @@ VectorField::VectorField(char *filename)
   str[index] = '\0';
 
   if (index >= 100) {
-    fprintf (stderr, "Header bad in file.\n");
-    exit (-1);
+    fprintf(stderr, "Header bad in file.\n");
+    exit(-1);
   }
 
-  sscanf (str, "VF\n%d %d %d\n%d\n", &xsize, &ysize, &zsize, &rank);
+  sscanf(str, "VF\n%d %d %d\n%d\n", &xsize, &ysize, &zsize, &rank);
   aspect = ysize / (float) xsize;
   aspect_recip = 1.0 / aspect;
 
 //  cout << "size: " << xsize << " " << ysize << endl;
 
   values = new float[xsize * ysize * 2];
-  infile.read ((char *)values, xsize * ysize * 2 * sizeof (float));
+  infile.read((char *) values, xsize * ysize * 2 * sizeof(float));
 
   infile.close();
 }
@@ -103,22 +104,22 @@ void VectorField::write_file(char *filename)
   /* append ".vec" to the file name if necesary */
 
   char name[80];
-  strcpy (name, filename);
-  if (strlen (name) < 4 || strcmp (name + strlen (name) - 4, ".vec") != 0)
-    strcat (name, ".vec");
+  strcpy(name, filename);
+  if (strlen(name) < 4 || strcmp(name + strlen(name) - 4, ".vec") != 0)
+    strcat(name, ".vec");
 
-  int fd = open(name, O_CREAT|O_TRUNC|O_WRONLY, 0666);
+  int fd = open(name, O_CREAT | O_TRUNC | O_WRONLY, 0666);
   if (fd < 0) {
     fprintf(stderr, "Unable to open %s: %s\n", name, strerror(errno));
     exit(-1);
   }
 
   char str[80];
-  sprintf (str, "VF\n%d %d %d\n%d\n", xsize, ysize, zsize, rank);
+  sprintf(str, "VF\n%d %d %d\n%d\n", xsize, ysize, zsize, rank);
   int cc = write(fd, str, strlen(str));
   if (cc == -1) {
-    fprintf (stderr, "Can't write to file.\n");
-    exit (-1);
+    fprintf(stderr, "Can't write to file.\n");
+    exit(-1);
   }
 
   cc = write(fd, (char *) values, sizeof(float) * xsize * ysize * 2);
@@ -148,8 +149,8 @@ float VectorField::xval(float x, float y)
   if (x < 0 || x > 1 || y < 0 || y > aspect)
     return (0.0);
 
-  x = x * (xsize-1);
-  y = y * (ysize-1) * aspect_recip;
+  x = x * (xsize - 1);
+  y = y * (ysize - 1) * aspect_recip;
 
   int i = (int) x;
   int j = (int) y;
@@ -186,8 +187,8 @@ float VectorField::yval(float x, float y)
   if (x < 0 || x > 1 || y < 0 || y > aspect)
     return (0.0);
 
-  x = x * (xsize-1);
-  y = y * (ysize-1) * aspect_recip;
+  x = x * (xsize - 1);
+  y = y * (ysize - 1) * aspect_recip;
 
   int i = (int) x;
   int j = (int) y;
@@ -223,15 +224,15 @@ Exit:
 ******************************************************************************/
 
 float VectorField::xyval(
-  float x,
-  float y,
-  int normalize,
-  float& xval,
-  float& yval
+        float x,
+        float y,
+        int normalize,
+        float &xval,
+        float &yval
 )
 {
   int index;
-  float xv,yv;
+  float xv, yv;
 
   if (x < 0 || x > 1 || y < 0 || y > aspect) {
     xval = 0.0;
@@ -239,8 +240,8 @@ float VectorField::xyval(
     return (0.0);
   }
 
-  x = x * (xsize-1);
-  y = y * (ysize-1) * aspect_recip;
+  x = x * (xsize - 1);
+  y = y * (ysize - 1) * aspect_recip;
 
   int i = (int) x;
   int j = (int) y;
@@ -268,7 +269,7 @@ float VectorField::xyval(
   float y1 = y10 + xfract * (y11 - y10);
   yv = y0 + yfract * (y1 - y0);
 
-  float len = sqrt (xv * xv + yv * yv);
+  float len = sqrt(xv * xv + yv * yv);
 
   if (normalize) {
     if (len != 0.0) {
@@ -307,39 +308,36 @@ Exit:
   returns the length of the step
 ******************************************************************************/
 float VectorField::integrate(
-  float x,
-  float y,
-  float delta,
-  int normalize,
-  float& xnew,
-  float& ynew
+        float x,
+        float y,
+        float delta,
+        int normalize,
+        float &xnew,
+        float &ynew
 )
 {
-  float xv,yv;
+  float xv, yv;
   float len;
 
   if (integrator == EULER) {
 
-    len = xyval (x, y, normalize, xv, yv);
+    len = xyval(x, y, normalize, xv, yv);
     xnew = x + delta * xv;
     ynew = y + delta * yv;
 
-  }
-  else if (integrator == MIDPOINT) {
+  } else if (integrator == MIDPOINT) {
 
-    len = xyval (x, y, normalize, xv, yv);
+    len = xyval(x, y, normalize, xv, yv);
     float x2 = x + 0.5 * delta * xv;
     float y2 = y + 0.5 * delta * yv;
-    len = xyval (x2, y2, normalize, xv, yv);
+    len = xyval(x2, y2, normalize, xv, yv);
     xnew = x + delta * xv;
     ynew = y + delta * yv;
 
-  }
-  else if (integrator == RUNGE_KUTTA) {
+  } else if (integrator == RUNGE_KUTTA) {
     return (0.0);
-  }
-  else {
-    fprintf (stderr, "Invalid integrator: %d\n", integrator);
+  } else {
+    fprintf(stderr, "Invalid integrator: %d\n", integrator);
     return (0.0);
   }
 
@@ -355,12 +353,12 @@ void VectorField::normalize()
 {
   for (int i = 0; i < xsize * ysize * 2; i += 2) {
     float x2 = values[i] * values[i];
-    float y2 = values[i+1] * values[i+1];
-    float len = sqrt (x2 + y2);
+    float y2 = values[i + 1] * values[i + 1];
+    float len = sqrt(x2 + y2);
     if (len != 0) {
       float recip = 1 / len;
       values[i] *= recip;
-      values[i+1] *= recip;
+      values[i + 1] *= recip;
     }
   }
 }
@@ -376,8 +374,8 @@ FloatImage *VectorField::get_magnitude()
 
   for (int i = 0; i < xsize * ysize * 2; i += 2) {
     float x = values[i];
-    float y = values[i+1];
-    image->pixel(i/2) = sqrt (x*x + y*y);
+    float y = values[i + 1];
+    image->pixel(i / 2) = sqrt(x * x + y * y);
   }
 
   return (image);
@@ -396,18 +394,18 @@ Exit:
 
 FloatImage *VectorField::get_vorticity(int xs, int ys)
 {
-  int i,j;
+  int i, j;
 
-  FloatImage *image = new FloatImage(xsize-2, ysize-2);
+  FloatImage *image = new FloatImage(xsize - 2, ysize - 2);
 
   float d = 0.1 / xsize;
 
-  for (i = 1; i < xsize-1; i++)
-    for (j = 1; j < ysize-1; j++) {
-      float dx = yval(i+1, j) - yval(i-1, j);
-      float dy = xval(i, j+1) - xval(i, j-1);
-      float vort = (dx/d) - (dy/d);
-      image->pixel(i-1, j-1) = vort;
+  for (i = 1; i < xsize - 1; i++)
+    for (j = 1; j < ysize - 1; j++) {
+      float dx = yval(i + 1, j) - yval(i - 1, j);
+      float dy = xval(i, j + 1) - xval(i, j - 1);
+      float vort = (dx / d) - (dy / d);
+      image->pixel(i - 1, j - 1) = vort;
     }
 
   FloatImage *image2 = new FloatImage(xs, ys);
@@ -416,7 +414,7 @@ FloatImage *VectorField::get_vorticity(int xs, int ys)
     for (j = 0; j < ys; j++) {
       float x = (i + 0.5) / xs;
       float y = (j + 0.5) / ys;
-      image2->pixel(i,j) = image->get_value(x,y);
+      image2->pixel(i, j) = image->get_value(x, y);
     }
 
   delete image;
@@ -436,18 +434,18 @@ Exit:
 
 FloatImage *VectorField::get_divergence(int xs, int ys)
 {
-  int i,j;
+  int i, j;
 
-  FloatImage *image = new FloatImage(xsize-2, ysize-2);
+  FloatImage *image = new FloatImage(xsize - 2, ysize - 2);
 
   float d = 0.1 / xsize;
 
-  for (i = 1; i < xsize-1; i++)
-    for (j = 1; j < ysize-1; j++) {
-      float dx = xval(i+1, j) - xval(i-1, j);
-      float dy = yval(i, j+1) - yval(i, j-1);
+  for (i = 1; i < xsize - 1; i++)
+    for (j = 1; j < ysize - 1; j++) {
+      float dx = xval(i + 1, j) - xval(i - 1, j);
+      float dy = yval(i, j + 1) - yval(i, j - 1);
       float div = (dx + dy) / (2 * d);
-      image->pixel(i-1, j-1) = div;
+      image->pixel(i - 1, j - 1) = div;
     }
 
   FloatImage *image2 = new FloatImage(xs, ys);
@@ -456,7 +454,7 @@ FloatImage *VectorField::get_divergence(int xs, int ys)
     for (j = 0; j < ys; j++) {
       float x = (i + 0.5) / xs;
       float y = (j + 0.5) / ys;
-      image2->pixel(i,j) = image->get_value(x,y);
+      image2->pixel(i, j) = image->get_value(x, y);
     }
 
   delete image;

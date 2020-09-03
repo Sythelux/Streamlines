@@ -16,5 +16,5 @@ warranty of merchantability or fitness for a particular purpose.
 extern int vary_arrow_intensity;
 extern float delta_step;
 
-void draw_arrow (Picture *, float, float, float, float, float);
+void draw_arrow(Picture *, float, float, float, float, float);
 

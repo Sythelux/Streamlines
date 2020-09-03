@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(streamlines)
 
-set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD 20)
 
 include_directories(libs)
 include_directories(src)
@@ -49,6 +49,39 @@ add_executable(stplace
         src/visparams.h
         )
 
+
+add_executable(stdraw
+        libs/cli.cpp
+        libs/cli.h
+        libs/clip_line.cpp
+        libs/clip_line.h
+        libs/floatimage.cpp
+        libs/floatimage.h
+        libs/window.cpp
+        libs/window.h
+        src/sd_params.cpp
+        src/sd_params.h
+        src/sd_picture.cpp
+        src/sd_picture.h
+        src/sd_repel.cpp
+        src/sd_repel.h
+        src/sd_streamline.cpp
+        src/sd_streamline.h
+        src/sd_vfield.cpp
+        src/sd_vfield.h
+        src/stdraw.cpp
+        src/stdraw.h
+        )
+
+add_executable(mfield
+        src/mfield.cpp
+        )
+
+add_executable(noise
+        src/noise.cpp
+        )
+
+# for compilation checks
 add_executable(streamlines
         libs/cli.cpp
         libs/cli.h

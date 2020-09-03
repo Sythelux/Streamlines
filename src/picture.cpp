@@ -30,7 +30,6 @@ warranty of merchantability or fitness for a particular purpose.
 #include "picture.h"
 
 
-
 /******************************************************************************
 Create a picture that will draw to a given window.
 
@@ -79,16 +78,16 @@ Entry:
 ******************************************************************************/
 
 void Picture::thick_line(
-  float x1,
-  float y1,
-  float x2,
-  float y2,
-  float thickness
+        float x1,
+        float y1,
+        float x2,
+        float y2,
+        float thickness
 )
 {
   if (type == PICT_WINDOW_TYPE) {
     int t = (int) thickness;
-    win->thick_line (x1, y1, x2, y2, t);
+    win->thick_line(x1, y1, x2, y2, t);
   }
 }
 
@@ -111,7 +110,7 @@ Define a vertex of a polygon.
 void Picture::polygon_vertex(float x, float y)
 {
   if (type == PICT_WINDOW_TYPE)
-    win->polygon_vertex (x, y);
+    win->polygon_vertex(x, y);
 }
 
 

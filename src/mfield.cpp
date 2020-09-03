@@ -49,10 +49,14 @@ float circulation = 0.0;
 char *myname;
 
 void usage();
+
 void init_noise();
-void noise_gradient(float, float, float&, float&);
-void electrostatic(float, float, float&, float&);
-void cylinder_flow(float, float, float&, float&);
+
+void noise_gradient(float, float, float &, float &);
+
+void electrostatic(float, float, float &, float &);
+
+void cylinder_flow(float, float, float &, float &);
 
 const int ncharges = 2;
 float charge[ncharges] = {0.01, -0.01};
@@ -60,47 +64,47 @@ float cx[ncharges] = {0.3, -0.3};
 float cy[ncharges] = {0.0, 0.0};
 
 float xmin = -0.5;
-float xmax =  0.5;
+float xmax = 0.5;
 float ymin = -0.5;
-float ymax =  0.5;
+float ymax = 0.5;
 
 
 /******************************************************************************
 Main routine.
 ******************************************************************************/
 
-void main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
-  char          *file;
-  float         *VectorField;
+  char *file;
+  float *VectorField;
   register float x, y;
-  register int   i, j;
-  int            fd, cc;
-  char           str[80];
+  register int i, j;
+  int fd, cc;
+  char str[80];
   char *s;
   int which = CIRCLE;
   float angle;
   int rotate_flag = 0;
   int lic_style = 0;    /* write out LIC file type? */
-  float cs,sn;
-  float fx,fy;
+  float cs, sn;
+  float fx, fy;
 
   myname = argv[0];
 
-  while(--argc > 0 && (*++argv)[0]=='-') {
-    for(s = argv[0]+1; *s; s++)
-      switch(*s) {
-	case 's':
-	  xsize = atoi (*++argv);
-	  ysize = atoi (*++argv);
-	  argc -= 2;
-	  break;
+  while (--argc > 0 && (*++argv)[0] == '-') {
+    for (s = argv[0] + 1; *s; s++)
+      switch (*s) {
+        case 's':
+          xsize = atoi(*++argv);
+          ysize = atoi(*++argv);
+          argc -= 2;
+          break;
         case 'f':
-	  which = atoi (*++argv);
+          which = atoi(*++argv);
           argc -= 1;
           break;
         case 'r':
-	  angle = atof (*++argv);
+          angle = atof(*++argv);
           rotate_flag = 1;
           argc -= 1;
           break;
@@ -108,26 +112,26 @@ void main(int argc, char *argv[])
           lic_style = 1;
           break;
         case 'n':
-	  noise_cycles = atof (*++argv);
+          noise_cycles = atof(*++argv);
           which = NOISE;
           argc -= 1;
           break;
         case 'c':
-	  circulation = atof (*++argv);
+          circulation = atof(*++argv);
           which = CYLINDER;
           argc -= 1;
           break;
         case 'm':
-	  xmin = atof (*++argv);
-	  xmax = atof (*++argv);
-	  ymin = atof (*++argv);
-	  ymax = atof (*++argv);
+          xmin = atof(*++argv);
+          xmax = atof(*++argv);
+          ymin = atof(*++argv);
+          ymax = atof(*++argv);
           argc -= 4;
           break;
-	default:
+        default:
           usage();
-          exit (-1);
-	  break;
+          exit(-1);
+          break;
       }
   }
 
@@ -137,10 +141,10 @@ void main(int argc, char *argv[])
     file = *argv;
   else {
     usage();
-    exit (-1);
+    exit(-1);
   }
 
-  VectorField = (float *)malloc(sizeof(float)*ysize*xsize*2);
+  VectorField = (float *) malloc(sizeof(float) * ysize * xsize * 2);
   if (VectorField == NULL) {
     fprintf(stderr, "%s: insufficient memory for creating the field\n", myname);
     exit(-1);
@@ -163,10 +167,10 @@ void main(int argc, char *argv[])
       /* position in field */
 
       float t;
-      t = (float)i/(float)(xsize-1);
+      t = (float) i / (float) (xsize - 1);
       x = xmin + t * (xmax - xmin);
 
-      t = (float)j/(float)(ysize-1);
+      t = (float) j / (float) (ysize - 1);
       y = ymin + t * (ymax - ymin);
 
       /* select field value */
@@ -192,59 +196,58 @@ void main(int argc, char *argv[])
           fy = -y;
           break;
         case ELECTRO:
-          electrostatic (x, y, fx, fy);
+          electrostatic(x, y, fx, fy);
           break;
         case CONSTANT:
           fx = 0.0;
           fy = 1.0;
           break;
         case NOISE:
-          noise_gradient (x, y, fx, fy);
+          noise_gradient(x, y, fx, fy);
           break;
         case CYLINDER:
-          cylinder_flow (x, y, fx, fy);
+          cylinder_flow(x, y, fx, fy);
           break;
         default:
-          fprintf (stderr, "Bad switch: %d\n", which);
+          fprintf(stderr, "Bad switch: %d\n", which);
       }
 
       /* possibly rotate vector */
       if (rotate_flag) {
         float xx = fx;
         float yy = fy;
-        fx =  cs * xx + sn * yy;
+        fx = cs * xx + sn * yy;
         fy = -sn * xx + cs * yy;
       }
 
       /* save vector value */
       if (lic_style) {
-        VectorField[2*((ysize - j - 1)*xsize + i) + 0] = fx;
-        VectorField[2*((ysize - j - 1)*xsize + i) + 1] = fy;
+        VectorField[2 * ((ysize - j - 1) * xsize + i) + 0] = fx;
+        VectorField[2 * ((ysize - j - 1) * xsize + i) + 1] = fy;
+      } else {
+        VectorField[2 * (j * xsize + i) + 0] = fx;
+        VectorField[2 * (j * xsize + i) + 1] = fy;
       }
-      else {
-        VectorField[2*(j*xsize + i) + 0] = fx;
-        VectorField[2*(j*xsize + i) + 1] = fy;
-      }
-   }
+    }
   }
 
-  fd = open(file, O_CREAT|O_TRUNC|O_WRONLY, 0666);
+  fd = open(file, O_CREAT | O_TRUNC | O_WRONLY, 0666);
   if (fd < 0) {
     fprintf(stderr, "%s: unable to open %s: %s\n", myname, file,
             strerror(errno));
     exit(-1);
   }
 
-  sprintf (str, "VF\n%d %d %d\n%d\n", xsize, ysize, zsize, Rank);
+  sprintf(str, "VF\n%d %d %d\n%d\n", xsize, ysize, zsize, Rank);
   cc = write(fd, str, strlen(str));
   if (cc == -1) {
-    fprintf (stderr, "Can't write to file.\n");
-    exit (-1);
+    fprintf(stderr, "Can't write to file.\n");
+    exit(-1);
   }
 
-  cc = write(fd, VectorField, 2*sizeof(float)*xsize*ysize);
+  cc = write(fd, VectorField, 2 * sizeof(float) * xsize * ysize);
 
-  if (cc != 2*sizeof(float)*xsize*ysize) {
+  if (cc != 2 * sizeof(float) * xsize * ysize) {
     fprintf(stderr, "%s: write returned short: %s\n", myname,
             strerror(errno));
     close(fd);
@@ -252,6 +255,7 @@ void main(int argc, char *argv[])
   }
 
   close(fd);
+  return 0;
 }
 
 
@@ -261,24 +265,24 @@ Print out usage information.
 
 void usage()
 {
-  fprintf (stderr, "%s: { options } output_file\n", myname);
-  fprintf (stderr, "         [-f field_type]\n");
-  fprintf (stderr, "         [-s xsize ysize]\n");
-  fprintf (stderr, "         [-r angle_in_degrees]\n");
-  fprintf (stderr, "         [-n noise_cycles]\n");
-  fprintf (stderr, "         [-c circulation]\n");
-  fprintf (stderr, "         [-l] (LIC file)\n");
-  fprintf (stderr, "         [-m xmin xmax ymin ymax]\n");
-  fprintf (stderr, "\n");
-  fprintf (stderr, "field_type:\n");
-  fprintf (stderr, "1 = circle (default)\n");
-  fprintf (stderr, "2 = saddle\n");
-  fprintf (stderr, "3 = source\n");
-  fprintf (stderr, "4 = sink\n");
-  fprintf (stderr, "5 = other saddle\n");
-  fprintf (stderr, "6 = electrostatic charges\n");
-  fprintf (stderr, "7 = constant vector\n");
-  fprintf (stderr, "8 = flow around cylinder\n");
+  fprintf(stderr, "%s: { options } output_file\n", myname);
+  fprintf(stderr, "         [-f field_type]\n");
+  fprintf(stderr, "         [-s xsize ysize]\n");
+  fprintf(stderr, "         [-r angle_in_degrees]\n");
+  fprintf(stderr, "         [-n noise_cycles]\n");
+  fprintf(stderr, "         [-c circulation]\n");
+  fprintf(stderr, "         [-l] (LIC file)\n");
+  fprintf(stderr, "         [-m xmin xmax ymin ymax]\n");
+  fprintf(stderr, "\n");
+  fprintf(stderr, "field_type:\n");
+  fprintf(stderr, "1 = circle (default)\n");
+  fprintf(stderr, "2 = saddle\n");
+  fprintf(stderr, "3 = source\n");
+  fprintf(stderr, "4 = sink\n");
+  fprintf(stderr, "5 = other saddle\n");
+  fprintf(stderr, "6 = electrostatic charges\n");
+  fprintf(stderr, "7 = constant vector\n");
+  fprintf(stderr, "8 = flow around cylinder\n");
 }
 
 /* primes for hash */
@@ -319,7 +323,7 @@ Exit:
 float noise(float x, float y)
 {
   int hash;
-  float n00,n01,n10,n11;
+  float n00, n01, n10, n11;
 
   x *= noise_cycles;
   y *= noise_cycles;
@@ -334,10 +338,10 @@ float noise(float x, float y)
 
   int i0 = i * PR1;
   int j0 = j * PR2;
-  int i1 = (i+1) * PR1;
-  int j1 = (j+1) * PR2;
+  int i1 = (i + 1) * PR1;
+  int j1 = (j + 1) * PR2;
 
-#define hash_value(a,b,result) hash = (a+b) % TABLE_MAX; \
+#define hash_value(a, b, result) hash = (a+b) % TABLE_MAX; \
                                if (hash < 0) hash += TABLE_MAX; \
                                result = rand_vals[hash];
 
@@ -348,7 +352,7 @@ float noise(float x, float y)
 
   float n0 = n00 * ty + n01 * (1 - ty);
   float n1 = n10 * ty + n11 * (1 - ty);
-  float n  =  n0 * tx +  n1 * (1 - tx);
+  float n = n0 * tx + n1 * (1 - tx);
 
   return (n);
 }
@@ -364,14 +368,14 @@ Exit:
   fx,fy - gradient of noise at this point
 ******************************************************************************/
 
-void noise_gradient(float x, float y, float& fx, float& fy)
+void noise_gradient(float x, float y, float &fx, float &fy)
 {
   float epsilon = 0.00001;
 
-  float nx0 = noise (x - epsilon, y);
-  float nx1 = noise (x + epsilon, y);
-  float ny0 = noise (x, y - epsilon);
-  float ny1 = noise (x, y + epsilon);
+  float nx0 = noise(x - epsilon, y);
+  float nx1 = noise(x + epsilon, y);
+  float ny0 = noise(x, y - epsilon);
+  float ny1 = noise(x, y + epsilon);
 
   fx = (nx1 - nx0) / epsilon;
   fy = (ny1 - ny0) / epsilon;
@@ -388,7 +392,7 @@ Exit:
   fx,fy - potential at point
 ******************************************************************************/
 
-void electrostatic(float x, float y, float& fx, float& fy)
+void electrostatic(float x, float y, float &fx, float &fy)
 {
   float xsum = 0;
   float ysum = 0;
@@ -398,7 +402,7 @@ void electrostatic(float x, float y, float& fx, float& fy)
     float dy = y - cy[i];
 
     float r2 = dx * dx + dy * dy;
-    float r = sqrt (r2);
+    float r = sqrt(r2);
 
     xsum += charge[i] / r2 * (dx / r);
     ysum += charge[i] / r2 * (dy / r);
@@ -419,22 +423,22 @@ Exit:
   vx,vy - velocity at point
 ******************************************************************************/
 
-void cylinder_flow(float x, float y, float& vx, float& vy)
+void cylinder_flow(float x, float y, float &vx, float &vy)
 {
   float U = 0.5;
   float a = 0.25;
 
-  float r = sqrt (x*x + y*y);
+  float r = sqrt(x * x + y * y);
 
   float theta;
   if (x == 0 && y == 0)
     theta = 0;
   else
-    theta = atan2 (y, x);
+    theta = atan2(y, x);
 
   float circ = circulation / (2 * M_PI * r);
-  float u_radius =  U * (1 - (a*a)/(r*r)) * cos(theta);
-  float u_theta  = -U * (1 + (a*a)/(r*r)) * sin(theta) - circ;
+  float u_radius = U * (1 - (a * a) / (r * r)) * cos(theta);
+  float u_theta = -U * (1 + (a * a) / (r * r)) * sin(theta) - circ;
 
   vx = u_radius * cos(theta) - u_theta * sin(theta);
   vy = u_radius * sin(theta) + u_theta * cos(theta);

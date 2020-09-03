@@ -20,7 +20,7 @@ warranty of merchantability or fitness for a particular purpose.
 */
 
 
-#define  START_CLI(prompt,extension)                  \
+#define  START_CLI(prompt, extension)                  \
                                                       \
          do {                                         \
            read_command (prompt);                     \
@@ -33,7 +33,7 @@ warranty of merchantability or fitness for a particular purpose.
            }
 
 
-#define  END_CLI(error,bye)                     \
+#define  END_CLI(error, bye)                     \
                                                 \
            else if (! cli_command ("exit"))     \
              none_of_the_above (error);         \
@@ -43,7 +43,7 @@ warranty of merchantability or fitness for a particular purpose.
 #define  COMMAND(desc)  else if (cli_command (desc))
 
 
-#define  START_SUBCLI(prompt,extension)                \
+#define  START_SUBCLI(prompt, extension)                \
                                                        \
          do {                                          \
            read_command (prompt);                      \
@@ -53,7 +53,7 @@ warranty of merchantability or fitness for a particular purpose.
            }
 
 
-#define  END_SUBCLI(error,bye)                  \
+#define  END_SUBCLI(error, bye)                  \
                                                 \
            else if (! cli_command ("exit"))     \
              none_of_the_above (error);         \
@@ -70,22 +70,40 @@ warranty of merchantability or fitness for a particular purpose.
 /* external declarations */
 
 int file_is_open();
-void add_extension (char *, char *);
-void get_file_name (char *, char *);
-void open_cli_file (char *);
+
+void add_extension(char *, char *);
+
+void get_file_name(char *, char *);
+
+void open_cli_file(char *);
+
 void set_echo();
-void read_command (char *);
+
+void read_command(char *);
+
 char *get_last_match();
-int cli_command (char *);
-int get_parameter (char *);
-int get_string (char *);
+
+int cli_command(char *);
+
+int get_parameter(char *);
+
+int get_string(char *);
+
 int get_boolean();
-int get_integer (int *);
-int get_real (float *);
-int get_double (double *);
-void none_of_the_above (char *);
-int no_more_commands (char *);
-void begin_audit (char *);
+
+int get_integer(int *);
+
+int get_real(float *);
+
+int get_double(double *);
+
+void none_of_the_above(char *);
+
+int no_more_commands(char *);
+
+void begin_audit(char *);
+
 void end_audit();
-void set_echo_filename (int);
+
+void set_echo_filename(int);
 

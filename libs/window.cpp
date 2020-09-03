@@ -27,6 +27,7 @@ warranty of merchantability or fitness for a particular purpose.
 #include "window.h"
 
 static void quit_proc();
+
 static void draw_proc();
 
 static Window2d *window_list[20];
@@ -62,16 +63,16 @@ void Window2d::makecolor(int index, float r, float g, float b)
   index = (int) ((index / 255.0) * (num_colors - 1));
 
   if (index < 0 || index >= num_colors) {
-    printf ("makecolor index out of bounds: %d\n", index);
+    printf("makecolor index out of bounds: %d\n", index);
     return;
   }
 
-  col.red   = (unsigned short) (65535 * r);
+  col.red = (unsigned short) (65535 * r);
   col.green = (unsigned short) (65535 * g);
-  col.blue  = (unsigned short) (65535 * b);
+  col.blue = (unsigned short) (65535 * b);
   col.pixel = colors[index].pixel;
   col.flags = DoRed | DoGreen | DoBlue;
-  XStoreColor (display, defColormap, &col);
+  XStoreColor(display, defColormap, &col);
 }
 
 
@@ -90,16 +91,16 @@ void Window2d::makeicolor(int index, int r, int g, int b)
   index = (int) ((index / 255.0) * (num_colors - 1));
 
   if (index < 0 || index >= num_colors) {
-    printf ("makecolor index out of bounds: %d\n", index);
+    printf("makecolor index out of bounds: %d\n", index);
     return;
   }
 
-  col.red   = (unsigned short) (65535 * (r / 255.0));
+  col.red = (unsigned short) (65535 * (r / 255.0));
   col.green = (unsigned short) (65535 * (g / 255.0));
-  col.blue  = (unsigned short) (65535 * (b / 255.0));
+  col.blue = (unsigned short) (65535 * (b / 255.0));
   col.pixel = colors[index].pixel;
   col.flags = DoRed | DoGreen | DoBlue;
-  XStoreColor (display, defColormap, &col);
+  XStoreColor(display, defColormap, &col);
 }
 
 
@@ -118,10 +119,10 @@ void Window2d::thick_iline(int x1, int y1, int x2, int y2, int thick)
 
   gcvalues.line_width = thick;
   gcvalues.foreground = colors[color].pixel;
-  XChangeGC (display, gc, GCForeground|GCLineWidth, &gcvalues);
-  XDrawLine (display, root, gc, x1, ysize - y1 - 1, x2, ysize - y2 - 1);
+  XChangeGC(display, gc, GCForeground | GCLineWidth, &gcvalues);
+  XDrawLine(display, root, gc, x1, ysize - y1 - 1, x2, ysize - y2 - 1);
 
-  XFlush (display);
+  XFlush(display);
 }
 
 
@@ -138,10 +139,10 @@ void Window2d::iline(int x1, int y1, int x2, int y2)
   int color = color_index;
 
   gcvalues.foreground = colors[color].pixel;
-  XChangeGC (display, gc, GCForeground, &gcvalues);
-  XDrawLine (display, root, gc, x1, ysize - y1 - 1, x2, ysize - y2 - 1);
+  XChangeGC(display, gc, GCForeground, &gcvalues);
+  XDrawLine(display, root, gc, x1, ysize - y1 - 1, x2, ysize - y2 - 1);
 
-  XFlush (display);
+  XFlush(display);
 }
 
 
@@ -163,10 +164,10 @@ void Window2d::line(float x1, float y1, float x2, float y2)
   int b2 = (int) ((1 - y2 * vscale) * ysize);
 
   gcvalues.foreground = colors[color].pixel;
-  XChangeGC (display, gc, GCForeground, &gcvalues);
-  XDrawLine (display, root, gc, a1, b1, a2, b2);
+  XChangeGC(display, gc, GCForeground, &gcvalues);
+  XDrawLine(display, root, gc, a1, b1, a2, b2);
 
-  XFlush (display);
+  XFlush(display);
 }
 
 
@@ -190,10 +191,10 @@ void Window2d::thick_line(float x1, float y1, float x2, float y2, int thick)
 
   gcvalues.line_width = thick;
   gcvalues.foreground = colors[color].pixel;
-  XChangeGC (display, gc, GCForeground|GCLineWidth, &gcvalues);
-  XDrawLine (display, root, gc, a1, b1, a2, b2);
+  XChangeGC(display, gc, GCForeground | GCLineWidth, &gcvalues);
+  XDrawLine(display, root, gc, a1, b1, a2, b2);
 
-  XFlush (display);
+  XFlush(display);
 }
 
 
@@ -246,9 +247,9 @@ void Window2d::polygon_fill()
   int color = color_index;
 
   gcvalues.foreground = colors[color].pixel;
-  XChangeGC (display, gc, GCForeground, &gcvalues);
-  XFillPolygon (display, root, gc, points, npoints, Complex, CoordModeOrigin);
-  XFlush (display);
+  XChangeGC(display, gc, GCForeground, &gcvalues);
+  XFillPolygon(display, root, gc, points, npoints, Complex, CoordModeOrigin);
+  XFlush(display);
 
   delete points;
   npoints = 0;
@@ -259,7 +260,7 @@ void Window2d::polygon_fill()
 Draw a circle of a given radius.
 ******************************************************************************/
 
-void Window2d::circle (float x, float y, float radius, float intensity)
+void Window2d::circle(float x, float y, float radius, float intensity)
 {
   int color = (int) (intensity * (num_colors - 1));
   int xx = (int) (x * xsize);
@@ -267,8 +268,8 @@ void Window2d::circle (float x, float y, float radius, float intensity)
   int r = radius * xsize;
 
   gcvalues.foreground = colors[color].pixel;
-  XChangeGC (display, gc, GCForeground, &gcvalues);
-  XDrawArc (display, root, gc, xx-r, yy-r, r+r, r+r, 0, 360 * 64);
+  XChangeGC(display, gc, GCForeground, &gcvalues);
+  XDrawArc(display, root, gc, xx - r, yy - r, r + r, r + r, 0, 360 * 64);
 }
 
 
@@ -282,14 +283,14 @@ void Window2d::gray_ramp()
 
   for (int i = 0; i < num_colors; i++) {
     float t = 65535 * i / (num_colors - 1.0);
-    colors[i].red   = (unsigned short) t;
+    colors[i].red = (unsigned short) t;
     colors[i].green = (unsigned short) t;
-    colors[i].blue  = (unsigned short) t;
+    colors[i].blue = (unsigned short) t;
     colors[i].pixel = pixels[i];
     colors[i].flags = DoRed | DoGreen | DoBlue;
   }
 
-  XStoreColors (display, defColormap, colors, num_colors);
+  XStoreColors(display, defColormap, colors, num_colors);
 }
 
 
@@ -307,13 +308,13 @@ void Window2d::set_pixel_size(int size)
 Write a pixel to the screen.
 ******************************************************************************/
 
-void Window2d::writepixel (int x, int y, int color)
+void Window2d::writepixel(int x, int y, int color)
 {
   color = (int) ((color / 255.0) * (num_colors - 1));
 
   gcvalues.foreground = colors[color].pixel;
-  XChangeGC (display, gc, GCForeground, &gcvalues);
-  XFillRectangle (display, root, gc, x * psize, y * psize, psize, psize);
+  XChangeGC(display, gc, GCForeground, &gcvalues);
+  XFillRectangle(display, root, gc, x * psize, y * psize, psize, psize);
 }
 
 
@@ -331,12 +332,12 @@ void Window2d::setup_window()
   psize = 1;
 
   /* Open a connection to the display. */
-  if ((display = XOpenDisplay (NULL)) == NULL) {
-    printf ("Couldn't open display:\n");
-    printf ("Make sure X11 is running and DISPLAY is set correctly\n");
-    exit (-1);
+  if ((display = XOpenDisplay(NULL)) == NULL) {
+    printf("Couldn't open display:\n");
+    printf("Make sure X11 is running and DISPLAY is set correctly\n");
+    exit(-1);
   }
-  screen = XDefaultScreen (display);
+  screen = XDefaultScreen(display);
   num_colors = 30;
 
 /*
@@ -344,28 +345,28 @@ XSetErrorHandler (my_error_handler);
 */
 
   /* set up foreground, background colors (to Xdefaults, if any) */
-  if (XDisplayCells (display, screen) > 2)	/* this is a color display */
-    defColormap = XDefaultColormap (display, screen);
+  if (XDisplayCells(display, screen) > 2)  /* this is a color display */
+    defColormap = XDefaultColormap(display, screen);
 
-  foregrnd = XWhitePixel (display, screen);
-  backgrnd = XBlackPixel (display, screen);
+  foregrnd = XWhitePixel(display, screen);
+  backgrnd = XBlackPixel(display, screen);
 
   /* set up default depth, visual params */
-  defDepth = XDefaultDepth (display, screen);
-  defVisual = XDefaultVisual (display, screen);
+  defDepth = XDefaultDepth(display, screen);
+  defVisual = XDefaultVisual(display, screen);
 
   /* set up fonts */
 
-  RegFont   = XLoadQueryFont (display, "8x13");
-  SmallFont = XLoadQueryFont (display, "6x10");
-  BigFont   = XLoadQueryFont (display, "9x15");
+  RegFont = XLoadQueryFont(display, "8x13");
+  SmallFont = XLoadQueryFont(display, "6x10");
+  BigFont = XLoadQueryFont(display, "9x15");
 
   if (RegFont == NULL || SmallFont == NULL || BigFont == NULL) {
-    printf ("Couldn't find all fonts.\n");
+    printf("Couldn't find all fonts.\n");
   }
 
   /* create root cursor (left arrow) */
-  root_cursor = XCreateFontCursor (display, 68);
+  root_cursor = XCreateFontCursor(display, 68);
 
   /* create root window */
   attrib.background_pixel = backgrnd;
@@ -375,15 +376,15 @@ XSetErrorHandler (my_error_handler);
   attrib.override_redirect = True;
   */
   attrib.event_mask = ButtonPressMask | ButtonReleaseMask | ExposureMask |
-		      StructureNotifyMask;
+                      StructureNotifyMask;
   attrib.cursor = root_cursor;
-  root = XCreateWindow (display, RootWindow(display, screen),
-	      xorg, yorg,
-	      xsize, ysize, 1, defDepth, InputOutput,
-	      defVisual, CWBackPixel|CWBorderPixel|CWOverrideRedirect|
-	      CWEventMask|CWCursor, &attrib);
-  XChangeProperty (display, root, XA_WM_NAME, XA_STRING, 8, PropModeReplace,
-      (unsigned char *) "Icon", 5);
+  root = XCreateWindow(display, RootWindow(display, screen),
+                       xorg, yorg,
+                       xsize, ysize, 1, defDepth, InputOutput,
+                       defVisual, CWBackPixel | CWBorderPixel | CWOverrideRedirect |
+                                  CWEventMask | CWCursor, &attrib);
+  XChangeProperty(display, root, XA_WM_NAME, XA_STRING, 8, PropModeReplace,
+                  (unsigned char *) "Icon", 5);
 
   /* set up some graphics contexts */
 
@@ -391,25 +392,25 @@ XSetErrorHandler (my_error_handler);
   gcvalues.background = backgrnd;
   gcvalues.line_width = 1;
   gcvalues.font = RegFont->fid;
-  gc_reg_font = XCreateGC (display, root,
-		  GCForeground|GCBackground|GCLineWidth|GCFont,
-		  &gcvalues);
+  gc_reg_font = XCreateGC(display, root,
+                          GCForeground | GCBackground | GCLineWidth | GCFont,
+                          &gcvalues);
   gcvalues.font = SmallFont->fid;
-  gc_small_font = XCreateGC (display, root,
-		  GCForeground|GCBackground|GCLineWidth|GCFont,
-		  &gcvalues);
+  gc_small_font = XCreateGC(display, root,
+                            GCForeground | GCBackground | GCLineWidth | GCFont,
+                            &gcvalues);
   gcvalues.font = BigFont->fid;
-  gc_big_font = XCreateGC (display, root,
-		  GCForeground|GCBackground|GCLineWidth|GCFont,
-		  &gcvalues);
+  gc_big_font = XCreateGC(display, root,
+                          GCForeground | GCBackground | GCLineWidth | GCFont,
+                          &gcvalues);
 
   /* set up drawing parameters */
 
-  status = XAllocColorCells (display, defColormap,
-	   0, plane_masks, 0, pixels, num_colors);
+  status = XAllocColorCells(display, defColormap,
+                            0, plane_masks, 0, pixels, num_colors);
 
   if (status == 0) {
-    printf ("bad status from XAllocColorCells\n");
+    printf("bad status from XAllocColorCells\n");
     return;
   }
 
@@ -432,7 +433,7 @@ XSetErrorHandler (my_error_handler);
 
   gcvalues.foreground = foregrnd;
   gcvalues.background = backgrnd;
-  gc = XCreateGC (display, root, GCForeground|GCBackground, &gcvalues);
+  gc = XCreateGC(display, root, GCForeground | GCBackground, &gcvalues);
 
   /* set all callbacks to NULL */
 
@@ -464,24 +465,24 @@ void Window2d::draw_image(int width, int height, unsigned char *image_data)
   XImage *image;
   unsigned char *data;
 
-  data = new unsigned char [width * height];
+  data = new unsigned char[width * height];
 
   /* map [0,255] into range [0,num_colors] */
 
   for (int j = 0; j < height; j++) {
     int j2 = height - j - 1;  /* used to flip image vertically */
     for (int i = 0; i < width; i++) {
-      float t = image_data[i+j*width] / 256.0;
-      int col = (int) pixels [(int) (t * num_colors)];
-      data[i+j2*width] = col;
+      float t = image_data[i + j * width] / 256.0;
+      int col = (int) pixels[(int) (t * num_colors)];
+      data[i + j2 * width] = col;
     }
   }
 
-  image = XCreateImage (display, defVisual, defDepth, ZPixmap, 0,
-                        (char *) data, width, height, 8, 0);
+  image = XCreateImage(display, defVisual, defDepth, ZPixmap, 0,
+                       (char *) data, width, height, 8, 0);
 
-  XPutImage (display, root, gc, image, 0, 0, 0, 0, width, height);
-  XFlush (display);
+  XPutImage(display, root, gc, image, 0, 0, 0, 0, width, height);
+  XFlush(display);
 
   delete data;
 }
@@ -498,34 +499,34 @@ Entry:
 ******************************************************************************/
 
 void Window2d::draw_offset_image(
-  int width,
-  int height,
-  unsigned char *image_data,
-  int xoff,
-  int yoff
+        int width,
+        int height,
+        unsigned char *image_data,
+        int xoff,
+        int yoff
 )
 {
   XImage *image;
   unsigned char *data;
 
-  data = new unsigned char [width * height];
+  data = new unsigned char[width * height];
 
   /* map [0,255] into range [0,num_colors] */
 
   for (int j = 0; j < height; j++) {
     int j2 = height - j - 1;  /* used to flip image vertically */
     for (int i = 0; i < width; i++) {
-      float t = image_data[i+j*width] / 256.0;
-      int col = (int) pixels [(int) (t * num_colors)];
-      data[i+j2*width] = col;
+      float t = image_data[i + j * width] / 256.0;
+      int col = (int) pixels[(int) (t * num_colors)];
+      data[i + j2 * width] = col;
     }
   }
 
-  image = XCreateImage (display, defVisual, defDepth, ZPixmap, 0,
-                        (char *) data, width, height, 8, 0);
+  image = XCreateImage(display, defVisual, defDepth, ZPixmap, 0,
+                       (char *) data, width, height, 8, 0);
 
-  XPutImage (display, root, gc, image, 0, 0, xoff, yoff, width, height);
-  XFlush (display);
+  XPutImage(display, root, gc, image, 0, 0, xoff, yoff, width, height);
+  XFlush(display);
 
   delete data;
 }
@@ -540,12 +541,12 @@ int Window2d::left_button()
   int result;
   Window win_root;
   Window child;
-  int root_x,root_y;
-  int win_x,win_y;
+  int root_x, root_y;
+  int win_x, win_y;
   unsigned int keys_buttons;
 
-  result = XQueryPointer (display, root, &win_root, &child, &root_x, &root_y,
-			  &win_x, &win_y, &keys_buttons);
+  result = XQueryPointer(display, root, &win_root, &child, &root_x, &root_y,
+                         &win_x, &win_y, &keys_buttons);
 
   if (keys_buttons & Button1Mask)
     return (1);
@@ -563,12 +564,12 @@ int Window2d::middle_button()
   int result;
   Window win_root;
   Window child;
-  int root_x,root_y;
-  int win_x,win_y;
+  int root_x, root_y;
+  int win_x, win_y;
   unsigned int keys_buttons;
 
-  result = XQueryPointer (display, root, &win_root, &child, &root_x, &root_y,
-			  &win_x, &win_y, &keys_buttons);
+  result = XQueryPointer(display, root, &win_root, &child, &root_x, &root_y,
+                         &win_x, &win_y, &keys_buttons);
 
   if (keys_buttons & Button2Mask)
     return (1);
@@ -586,12 +587,12 @@ int Window2d::right_button()
   int result;
   Window win_root;
   Window child;
-  int root_x,root_y;
-  int win_x,win_y;
+  int root_x, root_y;
+  int win_x, win_y;
   unsigned int keys_buttons;
 
-  result = XQueryPointer (display, root, &win_root, &child, &root_x, &root_y,
-			  &win_x, &win_y, &keys_buttons);
+  result = XQueryPointer(display, root, &win_root, &child, &root_x, &root_y,
+                         &win_x, &win_y, &keys_buttons);
 
   if (keys_buttons & Button3Mask)
     return (1);
@@ -612,12 +613,12 @@ void Window2d::cursor_pos(float *x, float *y)
   int result;
   Window win_root;
   Window child;
-  int root_x,root_y;
-  int win_x,win_y;
+  int root_x, root_y;
+  int win_x, win_y;
   unsigned int keys_buttons;
 
-  result = XQueryPointer (display, root, &win_root, &child, &root_x, &root_y,
-			  &win_x, &win_y, &keys_buttons);
+  result = XQueryPointer(display, root, &win_root, &child, &root_x, &root_y,
+                         &win_x, &win_y, &keys_buttons);
 
   *x = win_x / xsize;
   *y = 1 - win_y / ysize;
@@ -636,11 +637,11 @@ void Window2d::cursor_ipos(int *x, int *y)
   int result;
   Window win_root;
   Window child;
-  int root_x,root_y;
+  int root_x, root_y;
   unsigned int keys_buttons;
 
-  result = XQueryPointer (display, root, &win_root, &child, &root_x, &root_y,
-			  x, y, &keys_buttons);
+  result = XQueryPointer(display, root, &win_root, &child, &root_x, &root_y,
+                         x, y, &keys_buttons);
 
   *y = ysize - *y - 1;
 }
@@ -650,53 +651,53 @@ void Window2d::cursor_ipos(int *x, int *y)
 Event handler for drawing area.
 ******************************************************************************/
 
-void Window2d::do_callbacks (char *data, XEvent *event)
+void Window2d::do_callbacks(char *data, XEvent *event)
 {
   XButtonEvent *button;
 
   button = (XButtonEvent *) event;
   int x = button->x;
   int y = this->ysize - button->y - 1;
-  
-  switch(event->type) {
+
+  switch (event->type) {
 
     case ButtonPress:
       switch (button->button) {
-	case Button1:
-	  if (press1)
-	    (*press1)(this, x, y);
-	  break;
-	case Button2:
-	  if (press2)
-	    (*press2)(this, x, y);
-	  break;
-	case Button3:
-	  if (press3)
-	    (*press3)(this, x, y);
-	  break;
+        case Button1:
+          if (press1)
+            (*press1)(this, x, y);
+          break;
+        case Button2:
+          if (press2)
+            (*press2)(this, x, y);
+          break;
+        case Button3:
+          if (press3)
+            (*press3)(this, x, y);
+          break;
       }
       break;
 
     case ButtonRelease:
       switch (button->button) {
-	case Button1:
-	  if (release1)
-	    (*release1)(this, x, y);
-	  break;
-	case Button2:
-	  if (release2)
-	    (*release2)(this, x, y);
-	  break;
-	case Button3:
-	  if (release3)
-	    (*release3)(this, x, y);
-	  break;
+        case Button1:
+          if (release1)
+            (*release1)(this, x, y);
+          break;
+        case Button2:
+          if (release2)
+            (*release2)(this, x, y);
+          break;
+        case Button3:
+          if (release3)
+            (*release3)(this, x, y);
+          break;
       }
       break;
 
     case Expose:
       if (redraw_callback)
-	(*redraw_callback)(this);
+        (*redraw_callback)(this);
       break;
 
     default:
@@ -719,17 +720,16 @@ void check_events()
 
     Window2d *win = window_list[i];
 
-    while (XPending (win->display)) {
+    while (XPending(win->display)) {
 
-      XNextEvent (win->display, &event);
+      XNextEvent(win->display, &event);
       e = (XAnyEvent *) &event;
 
       if (e->window == win->root) {
-	win->do_callbacks (NULL, &event);
-	found = 1;
-      }
-      else
-	printf ("check_events(): Oops, unknown event.\n");
+        win->do_callbacks(NULL, &event);
+        found = 1;
+      } else
+        printf("check_events(): Oops, unknown event.\n");
     }
   }
 }
@@ -801,7 +801,7 @@ void draw_rectangle (int x1, int y1, int x2, int y2, int color)
   gcvalues.foreground = colors[color].pixel;
   XChangeGC (display, gc, GCForeground, &gcvalues);
   XFillRectangle (display, root, gc, x1 * psize, y1 * psize,
-		  dx * psize, dy * psize);
+      dx * psize, dy * psize);
 }
 
 

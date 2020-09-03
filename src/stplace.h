@@ -33,6 +33,7 @@ warranty of merchantability or fitness for a particular purpose.
 #define TAPER_CHANGE 0x0800
 
 void remove_streamline(Streamline *);
+
 void add_streamline(Streamline *);
 
 extern int animation_flag;
@@ -41,8 +42,9 @@ extern int anim_index;
 extern int vary_arrow_intensity;
 extern float delta_step;
 
-void postscript_draw_arrow (ofstream *, float, float, float, float, int, int);
-void draw_arrow (Window2d *, float, float, float, float, int, int);
+void postscript_draw_arrow(ofstream *, float, float, float, float, int, int);
+
+void draw_arrow(Window2d *, float, float, float, float, int, int);
 
 extern int verbose_flag;
 

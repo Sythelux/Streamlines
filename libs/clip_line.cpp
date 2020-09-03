@@ -134,14 +134,14 @@ int clip_line(float &x0, float &y0, float &x1, float &y1)
   int code11 = (y1 > ymax) ? 1 : 0;
 
 #if 0
-printf ("clip segment: %f %f %f %f\n", x0, y0, x1, y1);
+  printf ("clip segment: %f %f %f %f\n", x0, y0, x1, y1);
 #endif
 
   int sum0 = code01 + code02 + code03 + code04;
   int sum1 = code11 + code12 + code13 + code14;
 
 #if 0
-printf ("sum0 sum1: %d %d\n", sum0, sum1);
+  printf ("sum0 sum1: %d %d\n", sum0, sum1);
 #endif
 
   /* completely inside window? */
@@ -154,7 +154,7 @@ printf ("sum0 sum1: %d %d\n", sum0, sum1);
   if (code01 && code11 || code02 && code12 || code03 && code13 ||
       code04 && code14) {
 #if 0
-printf ("trivially invisible\n");
+    printf ("trivially invisible\n");
 #endif
     return (0);
   }
@@ -165,18 +165,18 @@ printf ("trivially invisible\n");
 
   /* case: only x0,y0 is inside window */
   if (sum0 == 0) {
-    int dummy = clip_helper (dx, dy, x1, y1, x1, y1);
+    int dummy = clip_helper(dx, dy, x1, y1, x1, y1);
 #if 0
-printf ("clip only x1,y1\n");
+    printf ("clip only x1,y1\n");
 #endif
     return (1);
   }
 
   /* case: only x1,y1 is inside window */
   if (sum1 == 0) {
-    int dummy = clip_helper (dx, dy, x0, y0, x0, y0);
+    int dummy = clip_helper(dx, dy, x0, y0, x0, y0);
 #if 0
-printf ("clip only x0,y0\n");
+    printf ("clip only x0,y0\n");
 #endif
     return (1);
   }
@@ -184,11 +184,11 @@ printf ("clip only x0,y0\n");
   /* neither endpoint is inside the window */
 
   int count = 0;
-  count += clip_helper (dx, dy, x0, y0, x0, y0);
-  count += clip_helper (dx, dy, x1, y1, x1, y1);
+  count += clip_helper(dx, dy, x0, y0, x0, y0);
+  count += clip_helper(dx, dy, x1, y1, x1, y1);
 
 #if 0
-printf ("clip both endpoints\n");
+  printf ("clip both endpoints\n");
 #endif
 
   if (count)

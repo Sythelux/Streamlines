@@ -90,6 +90,10 @@ public:
     void normalize();
 
     void write_file(char *);
+
+private:
+    void float_read(std::ifstream &ifstream);
+    void half_read(std::ifstream &ifstream);
 };
 
 void set_integration(int);  /* set which type of integrator to use */

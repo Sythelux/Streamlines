@@ -81,13 +81,13 @@ void set_echo();
 
 void read_command(char *);
 
-char *get_last_match();
+[[maybe_unused]] char *get_last_match();
 
 int cli_command(char *);
 
 int get_parameter(char *);
 
-int get_string(char *);
+[[maybe_unused]] int get_string(char *);
 
 int get_boolean();
 
@@ -95,15 +95,15 @@ int get_integer(int *);
 
 int get_real(float *);
 
-int get_double(double *);
+[[maybe_unused]] int get_double(double *);
 
 void none_of_the_above(char *);
 
 int no_more_commands(char *);
 
-void begin_audit(char *);
+[[maybe_unused]] void begin_audit(char *);
 
-void end_audit();
+[[maybe_unused]] void end_audit();
 
-void set_echo_filename(int);
+[[maybe_unused]] void set_echo_filename(int);
 

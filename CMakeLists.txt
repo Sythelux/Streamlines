@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
-project(streamlines)
+project(streamlines LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 20)
+set(CMAKE_CXX_STANDARD 11)
 
 include_directories(libs)
 include_directories(src)
@@ -9,6 +9,9 @@ include_directories(src)
 find_package(X11 REQUIRED)
 link_libraries(${X11_LIBRARIES})
 include_directories(${X11_INCLUDE_DIR})
+
+# SET(HALF_PRECISION_COMPILE_FLAGS "-fnative-half-type -fallow-half-arguments-and-returns") //does only work with clang 6.0
+# SET(CMAKE_CXX_FLAGS  "${CMAKE_CXX_FLAGS} ${HALF_PRECISION_COMPILE_FLAGS}")
 
 add_library(lib
         libs/window.cpp
@@ -59,6 +62,7 @@ add_executable(stdraw
         libs/floatimage.h
         libs/window.cpp
         libs/window.h
+        src/MiniFloat2.h
         src/sd_params.cpp
         src/sd_params.h
         src/sd_picture.cpp

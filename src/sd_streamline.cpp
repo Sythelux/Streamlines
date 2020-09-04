@@ -21,9 +21,9 @@ warranty of merchantability or fitness for a particular purpose.
 
 
 #include <iostream>
-#include <stdlib.h>
-#include <stdio.h>
-#include <math.h>
+#include <cstdlib>
+#include <cstdio>
+#include <cmath>
 #include "sd_vfield.h"
 #include "sd_streamline.h"
 #include "sd_params.h"
@@ -54,6 +54,10 @@ void set_grow_factor(float factor)
   grow_factor = factor;
 }
 
+bool isEqual(float a, float b)
+{
+  return fabs(a - b) < 0.001f;
+}
 
 /******************************************************************************
 Copy a streamline.
@@ -63,7 +67,7 @@ Streamline *Streamline::copy()
 {
 
   set_taper(taper_head, taper_tail);
-  Streamline *st = new Streamline(vf, xorig, yorig, length1, length2, delta);
+  auto *st = new Streamline(vf, xorig, yorig, length1, length2, delta);
 
   st->frozen = frozen;
   st->label = label;
@@ -106,7 +110,7 @@ void Streamline::streamline_creator(
   /* integrate to midpoint */
 
 #if 1
-  float dl = 0.5 * (len1 - len2);
+  float dl = 0.5f * (len1 - len2);
   int num = abs((int) (dl / dlen)) + 1;
   float dt = dl / num;
   x = xx;
@@ -117,14 +121,16 @@ void Streamline::streamline_creator(
   }
   xx = x;
   yy = y;
-  float new_len = 0.5 * (len1 + len2);
+  float new_len = 0.5f * (len1 + len2);
   len1 = len2 = new_len;
 #endif
+  if (!isnormal(xx) && !iszero(xx))
+    printf("%f\n", xx);
 
   /* origin must be within [0,1] x [0,aspect] */
 
   if (xx < 0 || xx > 1 || yy < 0 || yy > field->getaspect()) {
-//    printf ("streamline origin: %f %f\n", xx, yy);
+    printf("streamline origin: %f %f\n", xx, yy);
     float x = xx;
     float y = yy;
     clamp_to_screen(x, y, field->getaspect());
@@ -191,10 +197,10 @@ void Streamline::streamline_creator(
       set_clip_window(0.0, 1.0, 0.0, vf->getaspect());
       float x0 = xs(samples2 + i);
       float y0 = ys(samples2 + i);
-// printf ("clip #1 before: %f %f %f %f\n", x0, y0, x, y);
+      printf("clip #1 before: %f %f %f %f\n", x0, y0, x, y);
       clip_line(x0, y0, x, y);
-// printf ("clip #1  after: %f %f %f %f\n", x0, y0, x, y);
-// printf ("\n");
+      printf("clip #1  after: %f %f %f %f\n", x0, y0, x, y);
+      printf("\n");
       xs(samples2 + i + 1) = x;
       ys(samples2 + i + 1) = y;
       head_clipped = 1;
@@ -223,10 +229,10 @@ void Streamline::streamline_creator(
       set_clip_window(0.0, 1.0, 0.0, vf->getaspect());
       float x0 = xs(i + 1);
       float y0 = ys(i + 1);
-// printf ("clip #2 before: %f %f %f %f\n", x0, y0, x, y);
+      printf("clip #2 before: %f %f %f %f\n", x0, y0, x, y);
       clip_line(x0, y0, x, y);
-// printf ("clip #2  after: %f %f %f %f\n", x0, y0, x, y);
-// printf ("\n");
+      printf("clip #2  after: %f %f %f %f\n", x0, y0, x, y);
+      printf("\n");
       xs(i) = x;
       ys(i) = y;
       tail_clipped = 1;
@@ -290,7 +296,7 @@ Streamline::Streamline(
         float dlen
 )
 {
-  streamline_creator(field, xx, yy, len * 0.5, len * 0.5, dlen);
+  streamline_creator(field, xx, yy, len * 0.5f, len * 0.5f, dlen);
 }
 
 
@@ -313,6 +319,8 @@ Streamline::Streamline(
         float dlen
 )
 {
+  if (isEqual(xx, 0.463696003f) && isEqual(yy, 0.0748317018f))
+    printf("stop here.");
   streamline_creator(field, xx, yy, len1, len2, dlen);
 }
 
@@ -446,23 +454,25 @@ void Streamline::draw(Picture *pic)
 
   /* draw line segments */
 
-  float x_old = xs(start_reduction);
-  float y_old = ys(start_reduction);
+  float x_old = abs(xs(start_reduction));
+  float y_old = abs(ys(start_reduction));
 
   for (i = start_reduction + 1; i < samples - end_reduction; i++) {
 
     float x = xs(i);
     float y = ys(i);
 
-    val = vis_get_intensity(x, y);
-    pic->set_intensity(val * intensity * pts[i].intensity);
-    width = vis_get_draw_width(x, y) * pts[i].intensity;
-    pic->thick_line(x, y, x_old, y_old, width);
+    if (isnormal(x) && isnormal(y) && isnormal(x_old) &&
+        isnormal(y_old)) { //<- temporary solution something is calculating wrong
+      val = vis_get_intensity(x, y);
+      pic->set_intensity(val * intensity * pts[i].intensity);
+      width = vis_get_draw_width(x, y) * pts[i].intensity;
+      pic->thick_line(x, y, x_old, y_old, width);
+    }
 
     x_old = x;
     y_old = y;
   }
-
 #if 0
   /* maybe draw an arrow */
 
@@ -549,10 +559,10 @@ void Streamline::draw_fancy_arrow(
   steps = (int) floor((arrow_len - head_length) / dt);
   dlen = (arrow_len - head_length) / steps;
 
-  float *xverts1 = new float[steps];
-  float *yverts1 = new float[steps];
-  float *xverts2 = new float[steps];
-  float *yverts2 = new float[steps];
+  auto *xverts1 = new float[steps];
+  auto *yverts1 = new float[steps];
+  auto *xverts2 = new float[steps];
+  auto *yverts2 = new float[steps];
 
   for (int i = 0; i < steps; i++) {
 
@@ -577,7 +587,7 @@ void Streamline::draw_fancy_arrow(
 
   if (vary_arrow_intensity) {
     float val = vis_get_arrow_length(x, y) / vis_max_arrow_length();
-    val = 0.9 * val + 0.1;
+    val = 0.9f * val + 0.1f;
     pic->set_intensity(val);
   }
 
@@ -599,10 +609,10 @@ void Streamline::draw_fancy_arrow(
 
   pic->polygon_fill();
 
-  delete xverts1;
-  delete yverts1;
-  delete xverts2;
-  delete yverts2;
+  delete[] xverts1;
+  delete[] yverts1;
+  delete[] xverts2;
+  delete[] yverts2;
 }
 
 
@@ -661,7 +671,7 @@ float Streamline::dash_helper(
   float place_start;
   float place_end;
   float sep, center_sep;
-  float delta = 0.5 * delta_step;
+  float delta = 0.5f * delta_step;
 
   /* find the midpoint of the streamline */
 
@@ -670,7 +680,7 @@ float Streamline::dash_helper(
 
   /* find both ends of the center arrow */
 
-  float center_len = 0.5 * vis_get_arrow_length(x, y);
+  float center_len = 0.5f * vis_get_arrow_length(x, y);
 
   center_sep = separation * vis_get_arrow_length(x, y) / vis_max_arrow_length();
   bad1 = search_on_streamline(streamline_center + center_len, x1, y1);
@@ -694,7 +704,7 @@ float Streamline::dash_helper(
   while (place < len_sum) {
 
     search_on_streamline(place, x, y);
-    len = 0.5 * vis_get_arrow_length(x, y);
+    len = 0.5f * vis_get_arrow_length(x, y);
     sep = separation * vis_get_arrow_length(x, y) / vis_max_arrow_length();
     center = place + delta;
 
@@ -704,7 +714,7 @@ float Streamline::dash_helper(
         goto there;
       }
       search_on_streamline(center, x, y);
-      len = 0.5 * vis_get_arrow_length(x, y);
+      len = 0.5f * vis_get_arrow_length(x, y);
       sep = separation * vis_get_arrow_length(x, y) / vis_max_arrow_length();
     }
 
@@ -729,7 +739,7 @@ float Streamline::dash_helper(
   while (place > 0) {
 
     search_on_streamline(place, x, y);
-    len = 0.5 * vis_get_arrow_length(x, y);
+    len = 0.5f * vis_get_arrow_length(x, y);
     sep = separation * vis_get_arrow_length(x, y) / vis_max_arrow_length();
     center = place - delta;
 
@@ -739,7 +749,7 @@ float Streamline::dash_helper(
         goto here;
       }
       search_on_streamline(center, x, y);
-      len = 0.5 * vis_get_arrow_length(x, y);
+      len = 0.5f * vis_get_arrow_length(x, y);
       sep = separation * vis_get_arrow_length(x, y) / vis_max_arrow_length();
     }
 
@@ -835,7 +845,7 @@ void Streamline::variable_draw_dashed(
 
   float good_center = len_sum * 0.5;
   search_on_streamline(good_center, x, y);
-  center_len = 0.5 * vis_get_arrow_length(x, y);
+  center_len = 0.5f * vis_get_arrow_length(x, y);
 
   float best_center = good_center;
   float best_measure = len_sum;
@@ -859,7 +869,7 @@ void Streamline::variable_draw_dashed(
 
   /* find both ends of the center arrow */
 
-  center_len = 0.5 * vis_get_arrow_length(x, y);
+  center_len = 0.5f * vis_get_arrow_length(x, y);
   center_sep = separation * vis_get_arrow_length(x, y) / vis_max_arrow_length();
   bad1 = search_on_streamline(streamline_center + center_len, x1, y1);
   bad2 = search_on_streamline(streamline_center - center_len, x2, y2);
@@ -875,14 +885,14 @@ void Streamline::variable_draw_dashed(
 
   /* move forward along the streamline, drawing arrows */
 
-  delta = 0.5 * delta_step;
+  delta = 0.5f * delta_step;
 
   place = streamline_center + center_len + center_sep;
 
   while (place < len_sum) {
 
     search_on_streamline(place, x, y);
-    len = 0.5 * vis_get_arrow_length(x, y);
+    len = 0.5f * vis_get_arrow_length(x, y);
     sep = separation * vis_get_arrow_length(x, y) / vis_max_arrow_length();
     center = place + delta;
 
@@ -892,7 +902,7 @@ void Streamline::variable_draw_dashed(
         goto there;
       }
       search_on_streamline(center, x, y);
-      len = 0.5 * vis_get_arrow_length(x, y);
+      len = 0.5f * vis_get_arrow_length(x, y);
       sep = separation * vis_get_arrow_length(x, y) / vis_max_arrow_length();
     }
 
@@ -920,7 +930,7 @@ void Streamline::variable_draw_dashed(
   while (place > 0) {
 
     search_on_streamline(place, x, y);
-    len = 0.5 * vis_get_arrow_length(x, y);
+    len = 0.5f * vis_get_arrow_length(x, y);
     sep = separation * vis_get_arrow_length(x, y) / vis_max_arrow_length();
     center = place - delta;
 
@@ -930,7 +940,7 @@ void Streamline::variable_draw_dashed(
         goto here;
       }
       search_on_streamline(center, x, y);
-      len = 0.5 * vis_get_arrow_length(x, y);
+      len = 0.5f * vis_get_arrow_length(x, y);
       sep = separation * vis_get_arrow_length(x, y) / vis_max_arrow_length();
     }
 

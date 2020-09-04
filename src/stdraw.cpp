@@ -22,12 +22,12 @@ warranty of merchantability or fitness for a particular purpose.
 */
 
 
-#include <stdio.h>
+#include <cstdio>
 #include <iostream>
 #include <fstream>
-#include <stdlib.h>
+#include <cstdlib>
 #include <strings.h>
-#include <math.h>
+#include <cmath>
 #include <cstring>
 #include "cli.h"
 #include "window.h"
@@ -41,12 +41,10 @@ warranty of merchantability or fitness for a particular purpose.
 
 /* external declarations and forward pointers to routines */
 
-extern void check_events();
-
 void interpreter();
 
-VectorField *vf = NULL;         /* the vector field we're visualizing */
-FloatImage *float_reg = NULL;   /* scalar field "register" */
+VectorField *vf = nullptr;         /* the vector field we're visualizing */
+FloatImage *float_reg = nullptr;   /* scalar field "register" */
 
 Bundle *bundle;                 /* bundle of streamlines */
 

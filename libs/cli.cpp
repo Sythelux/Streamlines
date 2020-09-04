@@ -19,13 +19,14 @@ warranty of merchantability or fitness for a particular purpose.
 
 */
 
-#include <stdio.h>
+#include <cstdio>
 #include <strings.h>
-#include <iostream>
-#include <stdlib.h>
+#include <cstdlib>
 #include "cli.h"
 #include <cstring>
+#include <string>
 
+[[maybe_unused]]
 extern char *calloc();
 
 #define  toupper(c)  (((c) >= 'a' && (c) <= 'z') ? (c) - 'a' + 'A' : (c))
@@ -43,7 +44,7 @@ typedef struct afile
     struct afile *next;
 } File, *File_ptr;
 
-static File_ptr current_file = NULL;   /* pointer to list of input files */
+static File_ptr current_file = nullptr;   /* pointer to list of input files */
 
 static String input_line;       /* current line being processed */
 static String the_command;      /* first parameter in command line */
@@ -76,7 +77,7 @@ Returns 1 if a CLI input file is open, 0 otherwise.
 
 int file_is_open()
 {
-  return (current_file != NULL);
+  return (current_file != nullptr);
 }
 
 
@@ -153,7 +154,7 @@ static void open_file(char *name)
 
   fp = fopen(name, "r");
 
-  if (fp == NULL)
+  if (fp == nullptr)
     printf("File %s could not be opened.\n", name);
   else {
     new_file = (File_ptr) calloc(1, sizeof(File));
@@ -196,8 +197,8 @@ static int get_command(char *line, char *prompt, char *extension)
   if (file_is_open()) {
 
     c_status = fgets(line, MAX_STRING, current_file->fp);
-    if (c_status == NULL)
-      status = NULL;
+    if (c_status == nullptr)
+      status = 0;
     else
       status = 1;
 
@@ -209,7 +210,7 @@ static int get_command(char *line, char *prompt, char *extension)
 
     /* if we are at EOF, get a line elsewhere */
 
-    if (status == NULL) {
+    if (status == 0) {
       close_file();
       status = get_command(line, prompt, extension);
     } else if (echo_on)
@@ -218,12 +219,12 @@ static int get_command(char *line, char *prompt, char *extension)
     printf("%s%s", prompt, extension);
 
     c_status = fgets(line, MAX_STRING, stdin);
-    if (c_status == NULL)
-      status = NULL;
+    if (c_status == nullptr)
+      status = 0;
     else
       status = 1;
 
-    if (status == NULL)
+    if (status == 0)
       input_done = TRUE;
   }
 
@@ -266,7 +267,7 @@ static void process_command(char *line, char *prompt)
 
   /* get an extra line if neccessary */
 
-  if (*pos == '&' && get_command(extra, prompt, "--")) {
+  if (*pos == '&' && get_command(extra, prompt, (char *) "--")) {
     process_command(extra, prompt);
     *pos++ = ' ';
     for (pos_extra = extra; *pos_extra != '\0'; pos++, pos_extra++)
@@ -298,7 +299,7 @@ void read_command(char *prompt)
 {
   int got_one;
 
-  got_one = get_command(input_line, prompt, "> ");
+  got_one = get_command(input_line, prompt, (char *) "> ");
 
   if (!got_one)
     return;
@@ -310,8 +311,8 @@ void read_command(char *prompt)
 
   /* set various flags */
 
-  input_done = input_done || match("exit") || match(".");
-  help_on = match("help") || match("?") || match("/");
+  input_done = input_done || match((char *) "exit") || match((char *) ".");
+  help_on = match((char *) "help") || match((char *) "?") || match((char *) "/");
   comment_on = (input_line[0] == ' ')
                || (input_line[0] == '\0')
                || (input_line[0] == '!');
@@ -355,6 +356,7 @@ static int match(char *word)
 Returns pointer to last command matched.
 ******************************************************************************/
 
+[[maybe_unused]]
 char *get_last_match()
 {
   return (last_match);
@@ -431,6 +433,7 @@ Exit:
   returns 1 if there was anything to return, 0 otherwise
 ******************************************************************************/
 
+[[maybe_unused]]
 int get_string(char *string)
 {
   int count;
@@ -481,13 +484,10 @@ int get_boolean()
 
   /* now see what it matches */
 
-  if (!strcmp(s, "0"))
-    return (FALSE);
-  else if (!strcmp(s, "off"))
-    return (FALSE);
-  else if (!strcmp(s, "false"))
-    return (FALSE);
-  else if (!strcmp(s, "no"))
+  if (!strcmp(s, "0")
+      || !strcmp(s, "off")
+      || !strcmp(s, "false")
+      || !strcmp(s, "no"))
     return (FALSE);
   else
     return (TRUE);
@@ -511,7 +511,7 @@ int get_integer(int *n)
 
   *n = 0;
   if (got_one)
-    sscanf(s, "%d", n);
+    *n = std::stoi(s);
 
   return (got_one);
 }
@@ -534,7 +534,7 @@ int get_real(float *r)
 
   *r = 0.0;
   if (got_one)
-    sscanf(s, "%f", r);
+    *r = std::stof(s);
 
   return (got_one);
 }
@@ -548,6 +548,7 @@ Exit:
   returns 1 if there was a parameter to convert to double, 0 otherwise
 ******************************************************************************/
 
+[[maybe_unused]]
 int get_double(double *r)
 {
   String s;
@@ -557,7 +558,7 @@ int get_double(double *r)
 
   *r = 0.0;
   if (got_one)
-    sscanf(s, "%lf", r);
+    *r = std::stod(s);
 
   return (got_one);
 }
@@ -605,6 +606,7 @@ Open an audit file.  While file is open, all user commands will be written to
 this file.
 ******************************************************************************/
 
+[[maybe_unused]]
 void begin_audit(char *filename)
 {
   /* exit if audit file already open */
@@ -616,7 +618,7 @@ void begin_audit(char *filename)
 
   audit_file = fopen(filename, "w");
 
-  if (audit_file == NULL) {
+  if (audit_file == nullptr) {
     printf("Error opening audit file.\n");
     audit_on = FALSE;
   } else
@@ -628,6 +630,7 @@ void begin_audit(char *filename)
 Close the audit file.
 ******************************************************************************/
 
+[[maybe_unused]]
 void end_audit()
 {
   if (audit_on)
@@ -644,6 +647,7 @@ Entry:
   flag - whether to echo file (0 = don't echo, 1 = do echo)  
 ******************************************************************************/
 
+[[maybe_unused]]
 void set_echo_filename(int flag)
 {
   echo_name = flag;

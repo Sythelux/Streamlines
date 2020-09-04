@@ -27,9 +27,13 @@ warranty of merchantability or fitness for a particular purpose.
 #include <unistd.h>
 #include <fcntl.h>
 #include <cstring>
+#include <bitset>
+#include <iomanip>
 #include "window.h"
 #include "floatimage.h"
 #include "sd_vfield.h"
+#include "HalfFloat.h"
+#include "MiniFloat2.h"
 
 static int integrator = MIDPOINT;
 
@@ -81,16 +85,49 @@ VectorField::VectorField(char *filename)
 
   sscanf(str, "VF\n%d %d %d\n%d\n", &xsize, &ysize, &zsize, &rank);
   aspect = ysize / (float) xsize;
-  aspect_recip = 1.0 / aspect;
+  aspect_recip = 1.0f / aspect;
 
 //  cout << "size: " << xsize << " " << ysize << endl;
 
   values = new float[xsize * ysize * 2];
-  infile.read((char *) values, xsize * ysize * 2 * sizeof(float));
+  //float_read(infile);
+  half_read(infile);
 
   infile.close();
 }
 
+
+void VectorField::float_read(std::ifstream &infile)
+{
+  union
+  {
+      float f;
+      uint32_t i;
+  } u;
+
+  infile.read((char *) values, xsize * ysize * 2 * sizeof(float));
+
+  for (int i = 0; i < xsize * ysize * 2; ++i) {
+    u.f = values[i];
+    std::bitset<32> y(u.i);
+    std::cout << y << "    " << u.f << "\n";
+  }
+}
+
+void VectorField::half_read(std::ifstream &infile)
+{
+  auto tmp_values = new uint8_t[xsize * ysize * 2];
+  infile.read((char *) tmp_values, xsize * ysize * 2 * sizeof(uint8_t));
+
+  for (int i = 0; i < xsize * ysize * 2; ++i) {
+    values[i] = mini_to_float(tmp_values[i]);
+    /*std::bitset<8> y(tmp_values[i]);
+    std::cout << y << "    0x" << std::hex << std::setw(2) << static_cast<int>( tmp_values[i]) << "  " << values[i]
+              << "\n";
+              */
+  }
+
+}
 
 /******************************************************************************
 Write the vector field to a file.

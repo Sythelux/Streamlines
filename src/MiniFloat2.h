@@ -34,9 +34,11 @@ float mini_to_float(minifloat v)
 
   /*separate the value part away from the exponent part, and alter the
    accumulator accordingly*/
-  acc *= ((v & M_SGN) ?
+  acc *= (
+          (v & M_SGN) ?
           (-1 * (M_ALL ^ (M_EXP | (int8_t) v))) :
-          (M_VAL & v));
+          (M_VAL & v)
+  );
 
   /*now separate the exponential part away from the value part and alter
     the accumulator accordingly. */

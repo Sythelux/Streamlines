@@ -462,13 +462,13 @@ void Streamline::draw(Picture *pic)
     float x = xs(i);
     float y = ys(i);
 
-    if (isnormal(x) && isnormal(y) && isnormal(x_old) &&
-        isnormal(y_old)) { //<- temporary solution something is calculating wrong
+    //if (isnormal(x) && isnormal(y) && isnormal(x_old) &&
+    //    isnormal(y_old)) { //<- temporary solution something is calculating wrong
       val = vis_get_intensity(x, y);
       pic->set_intensity(val * intensity * pts[i].intensity);
       width = vis_get_draw_width(x, y) * pts[i].intensity;
       pic->thick_line(x, y, x_old, y_old, width);
-    }
+    //}
 
     x_old = x;
     y_old = y;
@@ -687,8 +687,8 @@ float Streamline::dash_helper(
   bad2 = search_on_streamline(streamline_center - center_len, x2, y2);
 
   if (bad1 || bad2) {
-    place_start = len_sum * 0.5;
-    place_end = len_sum * 0.5;
+    place_start = len_sum * 0.5f;
+    place_end = len_sum * 0.5f;
     goto here;
   }
 

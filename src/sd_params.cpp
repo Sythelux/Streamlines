@@ -20,11 +20,11 @@ warranty of merchantability or fitness for a particular purpose.
 */
 
 
-#include <stdio.h>
+#include <cstdio>
 #include <iostream>
 #include <fstream>
-#include <stdlib.h>
-#include <math.h>
+#include <cstdlib>
+#include <cmath>
 #include "floatimage.h"
 #include "sd_vfield.h"
 #include "sd_streamline.h"

@@ -91,7 +91,7 @@ VectorField::VectorField(char *filename)
 
   values = new float[xsize * ysize * 2];
   //float_read(infile);
-  half_read(infile);
+  minifloat_read(infile);
 
   infile.close();
 }
@@ -114,17 +114,16 @@ void VectorField::float_read(std::ifstream &infile)
   }
 }
 
-void VectorField::half_read(std::ifstream &infile)
+void VectorField::minifloat_read(std::ifstream &ifstream)
 {
   auto tmp_values = new uint8_t[xsize * ysize * 2];
-  infile.read((char *) tmp_values, xsize * ysize * 2 * sizeof(uint8_t));
+  ifstream.read((char *) tmp_values, xsize * ysize * 2 * sizeof(uint8_t));
 
   for (int i = 0; i < xsize * ysize * 2; ++i) {
     values[i] = mini_to_float(tmp_values[i]);
-    /*std::bitset<8> y(tmp_values[i]);
+    std::bitset<8> y(tmp_values[i]);
     std::cout << y << "    0x" << std::hex << std::setw(2) << static_cast<int>( tmp_values[i]) << "  " << values[i]
               << "\n";
-              */
   }
 
 }

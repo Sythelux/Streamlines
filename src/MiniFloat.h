@@ -14,6 +14,7 @@ typedef uint8_t minifloat;
     mantissa.  Like the 1:4:3 minifloat, but instead with the exponent as the
     least significant bits.
 
+    1:3:4
     |Sx|XXX|Sv|VVV|
 */
 

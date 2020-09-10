@@ -93,7 +93,7 @@ public:
 
 private:
     void float_read(std::ifstream &ifstream);
-    void half_read(std::ifstream &ifstream);
+    void minifloat_read(std::ifstream &ifstream);
 };
 
 void set_integration(int);  /* set which type of integrator to use */
